@@ -1,39 +1,29 @@
 package com.example.samuel.finalproject;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
-
 /**
- * Created by mengxiongliu on 05/11/2016.
+ * Created by mengxiongliu on 06/11/2016.
  */
 
-public class Restaurant extends AppCompatActivity {
-    private ListView listView;
-    private String[] text = {"Chipotle", "McDonald's"};
+public class Restaurant {
+    private int id;
+    private String name;
+    private String address;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_restaurant);
-        try {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch(NullPointerException ex) {
-            ex.printStackTrace();
-        }
+    public Restaurant(int id, String name, String address) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+    }
 
-        CustomList adapter = new CustomList(Restaurant.this, R.layout.custom_list, text);
-        listView = (ListView)findViewById(R.id.dish_list);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    public int getId() {
+        return id;
+    }
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(Restaurant.this, "You Clicked at " + text[position], Toast.LENGTH_SHORT).show();
-            }
-        });
+    public String getName() {
+        return name;
+    }
+
+    public String getAddress() {
+        return address;
     }
 }
