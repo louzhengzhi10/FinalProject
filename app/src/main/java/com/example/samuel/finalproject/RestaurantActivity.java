@@ -8,7 +8,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,7 +17,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -30,7 +28,7 @@ import java.util.regex.Pattern;
 public class RestaurantActivity extends AppCompatActivity {
     private int id;
     private ListView listView;
-    private List<String> text = new ArrayList<>();
+    private List<Dish> dishes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +44,13 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void refreshListView() {
-        CustomList adapter = new CustomList(RestaurantActivity.this, R.layout.custom_list, text.toArray(new String[text.size()]));
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
         listView = (ListView)findViewById(R.id.dish_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(RestaurantActivity.this, "You Clicked at " + text.get(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(RestaurantActivity.this, "You Clicked at " + dishes.get(position), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -91,7 +89,7 @@ public class RestaurantActivity extends AppCompatActivity {
                 for (String split : splits) {
                     split = split.replace("\\", "");
                     JSONObject dish = new JSONObject(split + "}");
-                    text.add(dish.getString("name"));
+                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price")));
                 }
             }
             catch (JSONException e) {

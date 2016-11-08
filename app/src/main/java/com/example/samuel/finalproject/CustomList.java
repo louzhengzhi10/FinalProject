@@ -27,7 +27,7 @@ public class CustomList extends ArrayAdapter<String>{
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
-        View rowView= inflater.inflate(layout_id, null, true);
+        View rowView = inflater.inflate(layout_id, null, true);
         TextView txtTitle = (TextView) rowView.findViewById(R.id.txt);
 
         txtTitle.setText(text[position]);
