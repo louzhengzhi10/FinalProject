@@ -30,7 +30,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
     private List<Dish> dishes;
     private String user;
 
-    public DishListAdapter(RestaurantActivity context, int resource, List<Dish> dishes, String user) {
+    public DishListAdapter(Activity context, int resource, List<Dish> dishes, String user) {
         super(context, resource, dishes);
         this.dishes = dishes;
         this.user = user;
