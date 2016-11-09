@@ -49,15 +49,21 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         TextView priceText = (TextView) context.findViewById(R.id.dishPrice);
         priceText.setText("$" + dish.getPrice());
 
-        ImageView likeView = (ImageView) context.findViewById(R.id.likeIcon);
+        final ImageView likeView = (ImageView) context.findViewById(R.id.likeIcon);
 
         likeView.setOnClickListener(new View.OnClickListener() {
+            private boolean liked = false;
+
             @Override
             public void onClick(View v) {
                 LikeDishTask task = new LikeDishTask();
                 String response = null;
                 try {
-                    response = task.execute(user, Integer.toString(dish.getId())).get();
+                    if (!liked)
+                        response = task.execute(user, Integer.toString(dish.getId()), "like").get();
+                    else
+                        response = task.execute(user, Integer.toString(dish.getId()), "unlike").get();
+                    liked = !liked;
                 }
                 catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
@@ -71,7 +77,11 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
     public class LikeDishTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request = "http://10.0.2.2:5000/like?email=" + params[0] + "&dish=" + params[1];
+            String request;
+            if (params[2].equals("like"))
+                request= "http://10.0.2.2:5000/like?email=" + params[0] + "&dish=" + params[1];
+            else
+                request = "http://10.0.2.2:5000/unlike?email=" + params[0] + "&dish=" + params[1];
             try {
                 URL url = new URL(request);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
