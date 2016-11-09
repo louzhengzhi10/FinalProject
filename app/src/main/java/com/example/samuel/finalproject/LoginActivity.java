@@ -3,6 +3,7 @@ package com.example.samuel.finalproject;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -82,6 +83,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+
+
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -89,6 +92,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 attemptLogin();
             }
         });
+
+        Button mEmailRegisterButton = (Button) findViewById(R.id.email_register_button);
+        mEmailRegisterButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                jump_to_register();
+            }
+        });
+
+
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -191,13 +204,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+        return email.contains("@") && email.contains(".");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+        if (password.length() < 6) {
+            return false;
+        } else if (password.contains("@")) {
+            return false;
+        }
+        return true;
+
+    }
+
+    private void jump_to_register() {
+        Intent fp=new Intent(getApplicationContext(), Register.class);
+        startActivity(fp);
     }
 
     /**
