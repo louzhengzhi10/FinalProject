@@ -54,8 +54,6 @@ public class RestaurantActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
                 intent.putExtra("dish_id", dishes.get(position).getId());
                 startActivity(intent);
-
-//                Toast.makeText(RestaurantActivity.this, "You Clicked at " + dishes.get(position), Toast.LENGTH_SHORT).show();
             }
         });
     }

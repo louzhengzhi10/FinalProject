@@ -1,5 +1,6 @@
 package com.example.samuel.finalproject;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -41,7 +42,12 @@ public class SimilarDishActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
 
-        new SearchMenuTask().execute();
+        new SimilarDishTask().execute();
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     private void refreshListView() {
@@ -51,15 +57,17 @@ public class SimilarDishActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(SimilarDishActivity.this, "You Clicked at " + dishes.get(position), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
+                intent.putExtra("dish_id", dishes.get(position).getId());
+                startActivity(intent);
             }
         });
     }
 
-    private class SearchMenuTask extends AsyncTask<String, Void, String> {
+    private class SimilarDishTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request = "http://10.0.2.2:5000/get_dish?restaurant=" + id;
+            String request = "http://10.0.2.2:5000/similar_dish?dish=" + id;
             try {
                 URL url = new URL(request);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -84,17 +92,16 @@ public class SimilarDishActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String message) {
-            try {
-                message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-                String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-                for (String split : splits) {
-                    split = split.replace("\\", "");
+            message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
+            String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
+            for (String split : splits) {
+                split = split.replace("\\", "");
+                try {
                     JSONObject dish = new JSONObject(split + "}");
                     dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price")));
+                } catch (Exception e) {
+                    continue;
                 }
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
             }
             refreshListView();
         }
