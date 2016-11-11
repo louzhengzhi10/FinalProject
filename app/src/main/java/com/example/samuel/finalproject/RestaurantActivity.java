@@ -3,6 +3,7 @@ package com.example.samuel.finalproject;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,9 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -31,6 +30,7 @@ import java.util.regex.Pattern;
 
 public class RestaurantActivity extends AppCompatActivity {
     private int id;
+    private String name;
     private String user = "mliu60@illinois.edu";
     private ListView listView;
     private List<Dish> dishes = new ArrayList<>();
@@ -56,9 +56,14 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onSupportNavigateUp(){
+        onBackPressed();
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // action with ID action_refresh was selected
             case R.id.action_menu:
                 new SearchMenuTask().execute("Menu");
                 break;

@@ -3,13 +3,13 @@ package com.example.samuel.finalproject;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -46,9 +46,11 @@ public class SimilarDishActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        finish();
+    public boolean onSupportNavigateUp(){
+        onBackPressed();
+        return true;
     }
+
 
     private void refreshListView() {
         DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
