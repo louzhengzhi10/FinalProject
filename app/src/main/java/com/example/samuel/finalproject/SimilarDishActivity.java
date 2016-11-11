@@ -38,7 +38,9 @@ public class SimilarDishActivity extends AppCompatActivity {
         id = getIntent().getExtras().getInt("dish_id");
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch(NullPointerException ex) {
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        catch(NullPointerException ex) {
             ex.printStackTrace();
         }
 
@@ -100,7 +102,8 @@ public class SimilarDishActivity extends AppCompatActivity {
                 split = split.replace("\\", "");
                 try {
                     JSONObject dish = new JSONObject(split + "}");
-                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price")));
+                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
+                            dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
                 } catch (Exception e) {
                     continue;
                 }

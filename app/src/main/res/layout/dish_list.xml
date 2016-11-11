@@ -4,9 +4,9 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/restaurantInfo"
+        android:id="@+id/restaurant_info"
         android:layout_width="wrap_content"
-        android:layout_height="100dp"
+        android:layout_height="160dp"
         android:layout_centerVertical="true"
         android:orientation="vertical"
         android:padding="5dp"
@@ -14,22 +14,26 @@
         android:layout_marginStart="10dp">
 
         <TextView
-            android:id="@+id/dishName"
+            android:id="@+id/dish_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="name"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/dishPrice"
+            android:id="@+id/dish_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="price"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/dish_restaurant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="16sp"/>
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/actionIcon"
+        android:id="@+id/action_icon"
         android:layout_width="wrap_content"
         android:layout_height="100dp"
         android:orientation="horizontal"
@@ -38,7 +42,7 @@
         android:layout_alignParentRight="true">
 
         <ImageView
-            android:id="@+id/likeIcon"
+            android:id="@+id/like_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="bottom"

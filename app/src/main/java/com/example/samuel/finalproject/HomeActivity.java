@@ -3,11 +3,7 @@ package com.example.samuel.finalproject;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -23,14 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-
 /**
- * Created by mengxiongliu on 05/11/2016.
+ * Created by mengxiongliu on 10/11/2016.
  */
 
-public class RestaurantActivity extends AppCompatActivity {
-    private int id;
-    private String name;
+public class HomeActivity extends AppCompatActivity {
     private String user = "mliu60@illinois.edu";
     private ListView listView;
     private List<Dish> dishes = new ArrayList<>();
@@ -38,30 +31,17 @@ public class RestaurantActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_restaurant);
-        try {
-            id = getIntent().getExtras().getInt("restaurant_id");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        setContentView(R.layout.activity_similar_dish);
 
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
-        catch(NullPointerException e) {
-            e.printStackTrace();
+        catch(NullPointerException ex) {
+            ex.printStackTrace();
         }
 
-        new SearchMenuTask().execute("Menu");
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_restaurant, menu);
-        return true;
+        new HomeActivity.LikedDishTask().execute();
     }
 
     @Override
@@ -70,25 +50,10 @@ public class RestaurantActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_menu:
-                new SearchMenuTask().execute("Menu");
-                break;
-            case R.id.action_recommendation:
-                new SearchMenuTask().execute("Recommendation");
-                break;
-            default:
-                break;
-        }
-        return true;
-    }
-
 
     private void refreshListView() {
         DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
-        listView = (ListView)findViewById(R.id.dish_list);
+        listView = (ListView)findViewById(R.id.similar_dish_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -100,15 +65,10 @@ public class RestaurantActivity extends AppCompatActivity {
         });
     }
 
-    private class SearchMenuTask extends AsyncTask<String, Void, String> {
+    private class LikedDishTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request;
-            if (params[0].equals("Menu"))
-                request = "http://10.0.2.2:5000/get_dish?restaurant=" + id;
-            else
-                request = "http://10.0.2.2:5000/recommend_dish?user=" + user + "&restaurant=" + id;
-
+            String request = "http://10.0.2.2:5000/liked_dish?user=" + user;
             try {
                 URL url = new URL(request);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -133,20 +93,20 @@ public class RestaurantActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String message) {
-            dishes = new ArrayList<>();
-            try {
-                message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-                String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-                for (String split : splits) {
-                    split = split.replace("\\", "");
+            message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
+            String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
+            for (String split : splits) {
+                split = split.replace("\\", "");
+                try {
                     JSONObject dish = new JSONObject(split + "}");
-                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price")));
+                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
+                            dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
+                } catch (Exception e) {
+                    continue;
                 }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
             }
             refreshListView();
         }
     }
 }
+

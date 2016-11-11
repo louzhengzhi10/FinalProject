@@ -2,6 +2,7 @@ package com.example.samuel.finalproject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,28 +30,44 @@ import java.util.concurrent.ExecutionException;
 public class DishListAdapter extends ArrayAdapter<Dish> {
     private List<Dish> dishes;
     private String user;
+    private Activity context;
 
     public DishListAdapter(Activity context, int resource, List<Dish> dishes, String user) {
         super(context, resource, dishes);
         this.dishes = dishes;
         this.user = user;
+        this.context = context;
     }
 
     @Override
-    public View getView(int position, View context, ViewGroup parent) {
-        if (context == null) {
-            context = LayoutInflater.from(getContext()).inflate(R.layout.dish_list, parent, false);
+    public View getView(int position, View view, ViewGroup parent) {
+        if (view == null) {
+            view = LayoutInflater.from(getContext()).inflate(R.layout.dish_list, parent, false);
         }
 
         final Dish dish = dishes.get(position);
 
-        final TextView nameText = (TextView) context.findViewById(R.id.dishName);
+        TextView nameText = (TextView) view.findViewById(R.id.dish_name);
         nameText.setText(dish.getName());
-        TextView priceText = (TextView) context.findViewById(R.id.dishPrice);
+        TextView priceText = (TextView) view.findViewById(R.id.dish_price);
         priceText.setText("$" + dish.getPrice());
 
-        final ImageView likeView = (ImageView) context.findViewById(R.id.likeIcon);
+        TextView restaurantText = (TextView) view.findViewById(R.id.dish_restaurant);
 
+        if (context instanceof SimilarDishActivity || context instanceof HomeActivity) {
+            restaurantText.setText(dish.getRestaurant_name());
+            restaurantText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context.getApplicationContext(), RestaurantActivity.class);
+                    intent.putExtra("restaurant_id", dish.getRestaurant_id());
+                    context.startActivity(intent);
+                }
+            });
+        }
+
+
+        ImageView likeView = (ImageView) view.findViewById(R.id.like_icon);
         likeView.setOnClickListener(new View.OnClickListener() {
             private boolean liked = false;
 
@@ -71,7 +88,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                 Toast.makeText(getContext(), response, Toast.LENGTH_SHORT).show();
             }
         });
-        return context;
+        return view;
     }
 
     public class LikeDishTask extends AsyncTask<String, Void, String> {
