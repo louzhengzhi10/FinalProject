@@ -54,6 +54,9 @@ public class SimilarDishActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Generate list view, called on post execute
+     */
     private void refreshListView() {
         DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
         listView = (ListView)findViewById(R.id.similar_dish_list);

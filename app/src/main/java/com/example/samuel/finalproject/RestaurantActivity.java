@@ -54,6 +54,7 @@ public class RestaurantActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // search for restaurant menu
         new SearchMenuTask().execute("Menu");
     }
 
@@ -85,11 +86,14 @@ public class RestaurantActivity extends AppCompatActivity {
         return true;
     }
 
-
+    /**
+     * Generate list view, called on post execute
+     */
     private void refreshListView() {
         DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
         listView = (ListView)findViewById(R.id.dish_list);
         listView.setAdapter(adapter);
+        // listener to on click event on dish button
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -100,10 +104,14 @@ public class RestaurantActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Asynchronous task used to send http request to backend server
+     */
     private class SearchMenuTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request;
+            // send get_dish / recommend_dish request
             if (params[0].equals("Menu"))
                 request = "http://10.0.2.2:5000/get_dish?restaurant=" + id;
             else
@@ -131,10 +139,15 @@ public class RestaurantActivity extends AppCompatActivity {
             return null;
         }
 
+        /**
+         * Parse response from server, and refresh list view
+         * @param message
+         */
         @Override
         protected void onPostExecute(String message) {
             dishes = new ArrayList<>();
             try {
+                // parse response
                 message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
                 String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
                 for (String split : splits) {
@@ -146,6 +159,7 @@ public class RestaurantActivity extends AppCompatActivity {
             catch (Exception e) {
                 e.printStackTrace();
             }
+            // refresh list view
             refreshListView();
         }
     }

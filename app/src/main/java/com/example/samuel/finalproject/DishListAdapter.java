@@ -54,11 +54,13 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
 
         TextView restaurantText = (TextView) view.findViewById(R.id.dish_restaurant);
 
+        // listener to on click event to restaurant name text
         if (context instanceof SimilarDishActivity || context instanceof HomeActivity) {
             restaurantText.setText(dish.getRestaurant_name());
             restaurantText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // start new restaurant activity
                     Intent intent = new Intent(context.getApplicationContext(), RestaurantActivity.class);
                     intent.putExtra("restaurant_id", dish.getRestaurant_id());
                     context.startActivity(intent);
@@ -68,6 +70,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
 
 
         ImageView likeView = (ImageView) view.findViewById(R.id.like_icon);
+        // listener to on click event to like icon
         likeView.setOnClickListener(new View.OnClickListener() {
             private boolean liked = false;
 
@@ -76,6 +79,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                 LikeDishTask task = new LikeDishTask();
                 String response = null;
                 try {
+                    // wait for response from server before moving on
                     if (!liked)
                         response = task.execute(user, Integer.toString(dish.getId()), "like").get();
                     else
@@ -91,10 +95,14 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         return view;
     }
 
+    /**
+     * Asynchronous task used to send http request to backend server
+     */
     public class LikeDishTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request;
+            // send like / unlike request
             if (params[2].equals("like"))
                 request= "http://10.0.2.2:5000/like?email=" + params[0] + "&dish=" + params[1];
             else
@@ -102,12 +110,14 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
             try {
                 URL url = new URL(request);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                // send a post request
                 conn.setRequestMethod("POST");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String inputLine;
                 StringBuffer response = new StringBuffer();
 
+                // read response stream
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);
                 }
@@ -116,6 +126,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                 String message = response.toString();
 
                 try {
+                    // parse string
                     message = message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1).replace("\\", "");
                     return new String(new JSONObject(message).getString("message"));
                 }
