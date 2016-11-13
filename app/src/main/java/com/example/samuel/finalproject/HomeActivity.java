@@ -142,29 +142,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private String sendRequest(String request) {
-        try {
-            URL url = new URL(request);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            return response.toString();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     private String[] splitString(String message) {
         message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
         return message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
@@ -174,7 +151,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String[] params) {
             String request = "http://10.0.2.2:5000/match_restaurant?restaurant=" + params[0];
-            return sendRequest(request);
+            return Utils.sendHTTPRequest(request, "GET");
         }
 
         @Override
@@ -202,7 +179,7 @@ public class HomeActivity extends AppCompatActivity {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request = "http://10.0.2.2:5000/liked_dish?user=" + user;
-            return sendRequest(request);
+            return Utils.sendHTTPRequest(request, "GET");
         }
 
         @Override

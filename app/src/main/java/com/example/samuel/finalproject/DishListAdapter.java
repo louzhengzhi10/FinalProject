@@ -107,37 +107,14 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                 request= "http://10.0.2.2:5000/like?email=" + params[0] + "&dish=" + params[1];
             else
                 request = "http://10.0.2.2:5000/unlike?email=" + params[0] + "&dish=" + params[1];
+
+            String message = Utils.sendHTTPRequest(request, "POST");
+
             try {
-                URL url = new URL(request);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                // send a post request
-                conn.setRequestMethod("POST");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                // read response stream
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                String message = response.toString();
-
-                try {
-                    // parse string
-                    message = message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1).replace("\\", "");
-                    return new String(new JSONObject(message).getString("message"));
-                }
-                catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-
+                message = message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1).replace("\\", "");
+                return new String(new JSONObject(message).getString("message"));
             }
-            catch (IOException e) {
+            catch (JSONException e) {
                 e.printStackTrace();
             }
             return null;
