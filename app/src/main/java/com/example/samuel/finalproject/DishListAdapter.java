@@ -69,7 +69,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         }
 
 
-        ImageView likeView = (ImageView) view.findViewById(R.id.like_icon);
+        ImageView likeView = (ImageView) view.findViewById(R.id.like_dish_icon);
         // listener to on click event to like icon
         likeView.setOnClickListener(new View.OnClickListener() {
             private boolean liked = false;
