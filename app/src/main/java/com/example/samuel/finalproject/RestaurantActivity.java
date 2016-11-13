@@ -117,26 +117,7 @@ public class RestaurantActivity extends AppCompatActivity {
             else
                 request = "http://10.0.2.2:5000/recommend_dish?user=" + user + "&restaurant=" + id;
 
-            try {
-                URL url = new URL(request);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return Utils.sendHTTPRequest(request, "GET");
         }
 
         /**
