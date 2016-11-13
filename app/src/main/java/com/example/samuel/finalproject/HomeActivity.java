@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -50,11 +52,16 @@ public class HomeActivity extends AppCompatActivity {
         catch(NullPointerException ex) {
             ex.printStackTrace();
         }
-
-        new HomeActivity.LikedDishTask().execute();
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_home, menu);
+        return true;
+    }
+
+        @Override
     public boolean onSupportNavigateUp(){
         onBackPressed();
         return true;
@@ -78,6 +85,8 @@ public class HomeActivity extends AppCompatActivity {
     private void onRestaurantSelected() {
         searchText.setVisibility(View.VISIBLE);
         searchButton.setVisibility(View.VISIBLE);
+        restaurants = new ArrayList<>();
+        refreshRestaurantListView();
     }
 
     private void onLikedDishSelected() {
@@ -87,12 +96,22 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void refreshRestaurantListView() {
-
+        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, "mliu60@illinois.edu");
+        listView = (ListView) findViewById(R.id.home_list);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), RestaurantActivity.class);
+                intent.putExtra("restaurant_id", restaurants.get(position).getId());
+                startActivity(intent);
+            }
+        });
     }
 
     private void refreshDishListView() {
         DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
-        listView = (ListView)findViewById(R.id.liked_dish_list);
+        listView = (ListView) findViewById(R.id.home_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
