@@ -40,7 +40,7 @@ public class Utils {
     }
 
     private static String[] splitString(String message) {
-        if (message == null)
+        if (message == null || message.equals(""))
             return null;
         message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
         return message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
