@@ -40,16 +40,19 @@ public class Utils {
     }
 
     private static String[] splitString(String message) {
+        if (message == null)
+            return null;
         message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
         return message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
     }
 
     public static List<Dish> parseDishList(String message) {
         List<Dish> dishes = new ArrayList<>();
-        String[] splits = splitString(message);
-        for (String split : splits) {
-            split = split.replace("\\", "");
-            try {
+        try {
+            String[] splits = splitString(message);
+            for (String split : splits) {
+                split = split.replace("\\", "");
+
                 JSONObject dish = new JSONObject(split + "}");
                 boolean liked;
                 if (HomeActivity.isLiked(dish.getInt("id")))
@@ -62,26 +65,27 @@ public class Utils {
                 else
                     dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"), liked));
             }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
         }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return dishes;
     }
 
     public static List<Restaurant> parseRestaurantList(String message) {
         List<Restaurant> restaurants = new ArrayList<>();
-        String[] splits = splitString(message);
-        for (String split : splits) {
-            split = split.replace("\\", "");
-            try {
+        try {
+            String[] splits = splitString(message);
+            for (String split : splits) {
+                split = split.replace("\\", "");
                 JSONObject restaurant = new JSONObject(split + "}");
                 restaurants.add(new Restaurant(restaurant.getInt("id"),
                         restaurant.getString("name"), restaurant.getString("address")));
             }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
         return restaurants;
     }

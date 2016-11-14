@@ -42,6 +42,8 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        likeID = new HashSet<>();
+
         searchText = (EditText) findViewById(R.id.search_txt);
         searchButton = (ImageView) findViewById(R.id.search_btn);
 
