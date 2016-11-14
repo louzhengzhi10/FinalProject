@@ -3,23 +3,15 @@ package com.example.samuel.finalproject;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by mengxiongliu on 08/11/2016.
@@ -27,8 +19,9 @@ import java.util.regex.Pattern;
 
 public class SimilarDishActivity extends AppCompatActivity {
     private int id;
+    private String user;
     private ListView listView;
-    private List<Dish> dishes = new ArrayList<>();
+    private List<Dish> dishes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +29,11 @@ public class SimilarDishActivity extends AppCompatActivity {
         setContentView(R.layout.activity_similar_dish);
 
         id = getIntent().getExtras().getInt("dish_id");
+        user = getIntent().getExtras().getString("user");
+
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
         catch(NullPointerException ex) {
@@ -48,8 +44,33 @@ public class SimilarDishActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_custom, menu);
+        return true;
+    }
+
+
+    @Override
     public boolean onSupportNavigateUp(){
         onBackPressed();
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_home:
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
+                break;
+            case R.id.action_sign_out:
+                startActivity(new Intent(this, LoginActivity.class));
+                break;
+            default:
+                break;
+        }
         return true;
     }
 
@@ -58,7 +79,7 @@ public class SimilarDishActivity extends AppCompatActivity {
      * Generate list view, called on post execute
      */
     private void refreshListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes);
         listView = (ListView)findViewById(R.id.similar_dish_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -66,6 +87,7 @@ public class SimilarDishActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
                 intent.putExtra("dish_id", dishes.get(position).getId());
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
@@ -75,42 +97,12 @@ public class SimilarDishActivity extends AppCompatActivity {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request = "http://10.0.2.2:5000/similar_dish?dish=" + id;
-            try {
-                URL url = new URL(request);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return Utils.sendHTTPRequest(request, "GET");
         }
 
         @Override
         protected void onPostExecute(String message) {
-            message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-            String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-            for (String split : splits) {
-                split = split.replace("\\", "");
-                try {
-                    JSONObject dish = new JSONObject(split + "}");
-                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
-                            dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
-                } catch (Exception e) {
-                    continue;
-                }
-            }
+            dishes = Utils.parseDishList(message);
             refreshListView();
         }
     }

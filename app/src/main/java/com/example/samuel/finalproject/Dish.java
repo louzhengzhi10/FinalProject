@@ -5,20 +5,23 @@ package com.example.samuel.finalproject;
  */
 
 public class Dish {
-    private int id = -1;
-    private String name = null;
+    private int id;
+    private String name;
     private float price;
     private int restaurant_id;
-    private String restaurant_name;
+    private String restaurant_name = null;
+    private boolean liked;
 
-    public Dish(int id, String name, float price) {
+    public Dish(int id, String name, float price, boolean liked) {
         this.id = id;
         this.name = name;
         this.price = price;
+        this.liked = liked;
+
     }
 
-    public Dish(int id, String name, float price, int restaurant_id, String restaurant_name) {
-        this(id, name, price);
+    public Dish(int id, String name, float price, int restaurant_id, String restaurant_name, boolean liked) {
+        this(id, name, price, liked);
         this.restaurant_id = restaurant_id;
         this.restaurant_name = restaurant_name;
     }
@@ -41,5 +44,13 @@ public class Dish {
 
     public String getRestaurant_name() {
         return restaurant_name;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
     }
 }
