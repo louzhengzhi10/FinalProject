@@ -18,6 +18,7 @@ import android.widget.ListView;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,8 @@ import java.util.regex.Pattern;
  */
 
 public class HomeActivity extends AppCompatActivity {
+    public static HashSet<Integer> likeID;
+
     private String user = "mliu60@illinois.edu";
     private ListView listView;
     private List<Dish> dishes;
@@ -71,7 +74,26 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        try {
+            new LikedIDTask().execute().get();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         onSearchRestaurantSelected();
+    }
+
+    public static void addToLikedID(int id) {
+        likeID.add(id);
+    }
+
+    public static void removeFromLikeID(int id) {
+        likeID.remove(id);
+    }
+
+    public static boolean isLiked(int id) {
+        return likeID.contains(id);
     }
 
     @Override
@@ -200,6 +222,19 @@ public class HomeActivity extends AppCompatActivity {
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
             refreshDishListView();
+        }
+    }
+
+    private class LikedIDTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String[] params) {
+            String request = "http://10.0.2.2:5000/liked_dish?user=" + user;
+            String message = Utils.sendHTTPRequest(request, "GET");
+            dishes = Utils.parseDishList(message);
+            likeID = new HashSet<>();
+            for (Dish dish : dishes)
+                likeID.add(dish.getId());
+            return null;
         }
     }
 }

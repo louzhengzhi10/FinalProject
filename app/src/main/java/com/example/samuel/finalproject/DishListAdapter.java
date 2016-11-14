@@ -71,21 +71,29 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
 
 
         ImageView likeView = (ImageView) view.findViewById(R.id.like_dish_icon);
+        if (dish.isLiked())
+            likeView.setImageResource(R.drawable.liked);
         // listener to on click event to like icon
         likeView.setOnClickListener(new View.OnClickListener() {
-            private boolean liked = false;
-
             @Override
             public void onClick(View v) {
                 LikeDishTask task = new LikeDishTask();
                 String response = null;
                 try {
                     // wait for response from server before moving on
-                    if (!liked)
+                    if (!dish.isLiked()) {
                         response = task.execute(user, Integer.toString(dish.getId()), "like").get();
-                    else
+                        HomeActivity.addToLikedID(dish.getId());
+                        ((ImageView) v).setImageResource(R.drawable.liked);
+                        dish.setLiked(true);
+
+                    }
+                    else {
                         response = task.execute(user, Integer.toString(dish.getId()), "unlike").get();
-                    liked = !liked;
+                        HomeActivity.removeFromLikeID(dish.getId());
+                        ((ImageView) v).setImageResource(R.drawable.like);
+                        dish.setLiked(false);
+                    }
                 }
                 catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();

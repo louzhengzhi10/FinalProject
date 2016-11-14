@@ -5,6 +5,14 @@
     android:layout_width="100dp"
     android:layout_height="wrap_content">
     <item
+        android:id="@+id/action_home"
+        android:icon="@drawable/home"
+        android:orderInCategory="100"
+        android:layout_alignParentRight="true"
+        android:title="Home"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_menu"
         android:title="Menu"
         android:orderInCategory="100"
@@ -23,6 +31,14 @@
     <item
         android:id="@+id/action_similar_restaurant"
         android:title="Similar Restaurants"
+        android:orderInCategory="200"
+        android:layout_alignParentRight="true"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_sign_out"
+        android:title="Sign Out"
         android:orderInCategory="200"
         android:layout_alignParentRight="true"
         app:showAsAction="never"

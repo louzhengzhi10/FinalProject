@@ -51,11 +51,16 @@ public class Utils {
             split = split.replace("\\", "");
             try {
                 JSONObject dish = new JSONObject(split + "}");
+                boolean liked;
+                if (HomeActivity.isLiked(dish.getInt("id")))
+                    liked = true;
+                else
+                    liked = false;
                 if (dish.has("restaurant_id") && dish.has("restaurant_name"))
                     dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
-                            dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
+                            dish.getInt("restaurant_id"), dish.getString("restaurant_name"), liked));
                 else
-                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price")));
+                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"), liked));
             }
             catch (Exception e) {
                 e.printStackTrace();

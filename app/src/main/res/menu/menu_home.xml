@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".HomeActivity"
     android:layout_width="100dp"
     android:layout_height="wrap_content">
+
     <item
         android:id="@+id/action_search_restaurant"
         android:title="Search Restaurant"
@@ -23,6 +24,14 @@
     <item
         android:id="@+id/action_liked_dish"
         android:title="Liked Dishes"
+        android:orderInCategory="200"
+        android:layout_alignParentRight="true"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_sign_out"
+        android:title="Sign Out"
         android:orderInCategory="200"
         android:layout_alignParentRight="true"
         app:showAsAction="never"

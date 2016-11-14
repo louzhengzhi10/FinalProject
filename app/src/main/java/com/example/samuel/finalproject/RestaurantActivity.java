@@ -46,6 +46,13 @@ public class RestaurantActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        try {
+            user = getIntent().getExtras().getString("user");
+        }
+        catch (Exception e) {
+            user = "mliu60@illinois.edu";
+        }
+
         // search for restaurant menu
         new SearchMenuTask().execute("Menu");
     }
@@ -66,6 +73,11 @@ public class RestaurantActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_home:
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
+                break;
             case R.id.action_menu:
                 new SearchMenuTask().execute("Menu");
                 break;
