@@ -63,6 +63,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                     // start new restaurant activity
                     Intent intent = new Intent(context.getApplicationContext(), RestaurantActivity.class);
                     intent.putExtra("restaurant_id", dish.getRestaurant_id());
+                    intent.putExtra("user", user);
                     context.startActivity(intent);
                 }
             });

@@ -24,8 +24,7 @@ import java.util.regex.Pattern;
 
 public class RestaurantActivity extends AppCompatActivity {
     private int id;
-    private String name;
-    private String user = "mliu60@illinois.edu";
+    private String user;
     private ListView listView;
     private List<Dish> dishes;
     private List<Restaurant> restaurants;
@@ -34,15 +33,13 @@ public class RestaurantActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
-        try {
-            id = getIntent().getExtras().getInt("restaurant_id");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        id = getIntent().getExtras().getInt("restaurant_id");
+        user = getIntent().getExtras().getString("user");
 
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
         catch(NullPointerException e) {
@@ -84,7 +81,7 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void refreshRestaurantListView() {
-        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, "mliu60@illinois.edu");
+        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, user);
         listView = (ListView)findViewById(R.id.restaurant_activity_list);
         listView.setAdapter(adapter);
         // listener to on click event on dish button
@@ -93,6 +90,7 @@ public class RestaurantActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), RestaurantActivity.class);
                 intent.putExtra("restaurant_id", restaurants.get(position).getId());
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
@@ -121,7 +119,7 @@ public class RestaurantActivity extends AppCompatActivity {
      * Generate list view, called on post execute
      */
     private void refreshDishListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, user);
         listView = (ListView)findViewById(R.id.restaurant_activity_list);
         listView.setAdapter(adapter);
         // listener to on click event on dish button
@@ -130,6 +128,7 @@ public class RestaurantActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
                 intent.putExtra("dish_id", dishes.get(position).getId());
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });

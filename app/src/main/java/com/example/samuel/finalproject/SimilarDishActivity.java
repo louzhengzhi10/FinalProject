@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 public class SimilarDishActivity extends AppCompatActivity {
     private int id;
+    private String user;
     private ListView listView;
     private List<Dish> dishes;
 
@@ -29,8 +30,11 @@ public class SimilarDishActivity extends AppCompatActivity {
         setContentView(R.layout.activity_similar_dish);
 
         id = getIntent().getExtras().getInt("dish_id");
+        user = getIntent().getExtras().getString("user");
+
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
         catch(NullPointerException ex) {
@@ -51,7 +55,7 @@ public class SimilarDishActivity extends AppCompatActivity {
      * Generate list view, called on post execute
      */
     private void refreshListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, user);
         listView = (ListView)findViewById(R.id.similar_dish_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -59,6 +63,7 @@ public class SimilarDishActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
                 intent.putExtra("dish_id", dishes.get(position).getId());
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });

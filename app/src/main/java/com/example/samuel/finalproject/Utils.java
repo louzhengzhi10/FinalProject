@@ -51,13 +51,14 @@ public class Utils {
             split = split.replace("\\", "");
             try {
                 JSONObject dish = new JSONObject(split + "}");
-                if (dish.has("restauran_id") && dish.has("restaurant_name"))
+                if (dish.has("restaurant_id") && dish.has("restaurant_name"))
                     dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
                             dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
                 else
                     dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price")));
             }
             catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return dishes;

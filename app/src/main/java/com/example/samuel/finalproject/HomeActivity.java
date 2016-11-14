@@ -44,10 +44,11 @@ public class HomeActivity extends AppCompatActivity {
 
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
-        catch(NullPointerException ex) {
-            ex.printStackTrace();
+        catch(NullPointerException e) {
+            e.printStackTrace();
         }
 
         searchText.addTextChangedListener(new TextWatcher() {
@@ -129,7 +130,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void refreshRestaurantListView() {
-        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, "mliu60@illinois.edu");
+        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, user);
         listView = (ListView) findViewById(R.id.home_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -137,13 +138,14 @@ public class HomeActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), RestaurantActivity.class);
                 intent.putExtra("restaurant_id", restaurants.get(position).getId());
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
     }
 
     private void refreshDishListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, user);
         listView = (ListView) findViewById(R.id.home_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -151,6 +153,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
                 intent.putExtra("dish_id", dishes.get(position).getId());
+                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
@@ -159,7 +162,7 @@ public class HomeActivity extends AppCompatActivity {
     private class SearchRestaurantTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
-            String request = "http://10.0.2.2:5000/match_restaurant?restaurant=" + params[0];
+            String request = "http://10.0.2.2:5000/match_restaurant?restaurant=" + params[0].replace(" ", "+");
             return Utils.sendHTTPRequest(request, "GET");
         }
 
@@ -173,14 +176,14 @@ public class HomeActivity extends AppCompatActivity {
     private class SearchDishTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
-            String request = "http://10.0.2.2:5000/match_dish?dish=" + params[0];
+            String request = "http://10.0.2.2:5000/match_dish?dish=" + params[0].replace(" ", "+");
             return Utils.sendHTTPRequest(request, "GET");
         }
 
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshRestaurantListView();
+            refreshDishListView();
         }
     }
 
