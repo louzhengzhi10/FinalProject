@@ -1,7 +1,6 @@
 package com.example.samuel.finalproject;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
@@ -15,11 +14,6 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -29,13 +23,11 @@ import java.util.concurrent.ExecutionException;
 
 public class DishListAdapter extends ArrayAdapter<Dish> {
     private List<Dish> dishes;
-    private String user;
     private Activity context;
 
-    public DishListAdapter(Activity context, int resource, List<Dish> dishes, String user) {
+    public DishListAdapter(Activity context, int resource, List<Dish> dishes) {
         super(context, resource, dishes);
         this.dishes = dishes;
-        this.user = user;
         this.context = context;
     }
 
@@ -63,7 +55,6 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                     // start new restaurant activity
                     Intent intent = new Intent(context.getApplicationContext(), RestaurantActivity.class);
                     intent.putExtra("restaurant_id", dish.getRestaurant_id());
-                    intent.putExtra("user", user);
                     context.startActivity(intent);
                 }
             });
@@ -82,14 +73,14 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                 try {
                     // wait for response from server before moving on
                     if (!dish.isLiked()) {
-                        response = task.execute(user, Integer.toString(dish.getId()), "like").get();
+                        response = task.execute(HomeActivity.getUser(), Integer.toString(dish.getId()), "like").get();
                         HomeActivity.addToLikedID(dish.getId());
                         ((ImageView) v).setImageResource(R.drawable.liked);
                         dish.setLiked(true);
 
                     }
                     else {
-                        response = task.execute(user, Integer.toString(dish.getId()), "unlike").get();
+                        response = task.execute(HomeActivity.getUser(), Integer.toString(dish.getId()), "unlike").get();
                         HomeActivity.removeFromLikeID(dish.getId());
                         ((ImageView) v).setImageResource(R.drawable.like);
                         dish.setLiked(false);

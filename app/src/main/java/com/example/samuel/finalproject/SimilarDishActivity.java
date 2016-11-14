@@ -11,11 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by mengxiongliu on 08/11/2016.
@@ -69,6 +65,9 @@ public class SimilarDishActivity extends AppCompatActivity {
                 intent.putExtra("user", user);
                 startActivity(intent);
                 break;
+            case R.id.action_sign_out:
+                startActivity(new Intent(this, LoginActivity.class));
+                break;
             default:
                 break;
         }
@@ -80,7 +79,7 @@ public class SimilarDishActivity extends AppCompatActivity {
      * Generate list view, called on post execute
      */
     private void refreshListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, user);
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes);
         listView = (ListView)findViewById(R.id.similar_dish_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

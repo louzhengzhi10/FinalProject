@@ -16,14 +16,10 @@ import java.util.List;
 
 public class RestaurantListAdapter extends ArrayAdapter<Restaurant> {
     private List<Restaurant> restaurants;
-    private String user;
-    private Activity context;
 
-    public RestaurantListAdapter(Activity context, int resource, List<Restaurant> restaurants, String user) {
+    public RestaurantListAdapter(Activity context, int resource, List<Restaurant> restaurants) {
         super(context, resource, restaurants);
         this.restaurants = restaurants;
-        this.user = user;
-        this.context = context;
     }
 
     @Override

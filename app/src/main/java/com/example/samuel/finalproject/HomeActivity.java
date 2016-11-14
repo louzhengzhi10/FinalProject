@@ -15,12 +15,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by mengxiongliu on 10/11/2016.
@@ -28,8 +25,8 @@ import java.util.regex.Pattern;
 
 public class HomeActivity extends AppCompatActivity {
     public static HashSet<Integer> likeID;
+    private static String user = "mliu60@illinois.edu";
 
-    private String user = "mliu60@illinois.edu";
     private ListView listView;
     private List<Dish> dishes;
     private List<Restaurant> restaurants;
@@ -86,6 +83,10 @@ public class HomeActivity extends AppCompatActivity {
         onSearchRestaurantSelected();
     }
 
+    public static String getUser() {
+        return user;
+    }
+
     public static void addToLikedID(int id) {
         likeID.add(id);
     }
@@ -123,6 +124,9 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.action_liked_dish:
                 onLikedDishSelected();
                 break;
+            case R.id.action_sign_out:
+                startActivity(new Intent(this, LoginActivity.class));
+                break;
             default:
                 break;
         }
@@ -154,7 +158,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void refreshRestaurantListView() {
-        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, user);
+        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants);
         listView = (ListView) findViewById(R.id.home_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -169,7 +173,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void refreshDishListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, user);
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes);
         listView = (ListView) findViewById(R.id.home_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

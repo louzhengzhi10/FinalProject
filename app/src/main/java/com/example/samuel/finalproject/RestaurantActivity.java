@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 
 public class RestaurantActivity extends AppCompatActivity {
     private int id;
-    private String user;
     private ListView listView;
     private List<Dish> dishes;
     private List<Restaurant> restaurants;
@@ -35,7 +34,6 @@ public class RestaurantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant);
 
         id = getIntent().getExtras().getInt("restaurant_id");
-        user = getIntent().getExtras().getString("user");
 
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -44,13 +42,6 @@ public class RestaurantActivity extends AppCompatActivity {
         }
         catch(NullPointerException e) {
             e.printStackTrace();
-        }
-
-        try {
-            user = getIntent().getExtras().getString("user");
-        }
-        catch (Exception e) {
-            user = "mliu60@illinois.edu";
         }
 
         // search for restaurant menu
@@ -74,8 +65,8 @@ public class RestaurantActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_home:
-                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                intent.putExtra("user", user);
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.putExtra("user", HomeActivity.getUser());
                 startActivity(intent);
                 break;
             case R.id.action_menu:
@@ -86,6 +77,10 @@ public class RestaurantActivity extends AppCompatActivity {
                 break;
             case R.id.action_similar_restaurant:
                 new SimilarRestaurantTask().execute();
+                break;
+            case R.id.action_sign_out:
+                startActivity(new Intent(this, LoginActivity.class));
+                break;
             default:
                 break;
         }
@@ -93,7 +88,7 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void refreshRestaurantListView() {
-        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, user);
+        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants);
         listView = (ListView)findViewById(R.id.restaurant_activity_list);
         listView.setAdapter(adapter);
         // listener to on click event on dish button
@@ -102,7 +97,6 @@ public class RestaurantActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), RestaurantActivity.class);
                 intent.putExtra("restaurant_id", restaurants.get(position).getId());
-                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
@@ -131,7 +125,7 @@ public class RestaurantActivity extends AppCompatActivity {
      * Generate list view, called on post execute
      */
     private void refreshDishListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, user);
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes);
         listView = (ListView)findViewById(R.id.restaurant_activity_list);
         listView.setAdapter(adapter);
         // listener to on click event on dish button
@@ -140,7 +134,6 @@ public class RestaurantActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
                 intent.putExtra("dish_id", dishes.get(position).getId());
-                intent.putExtra("user", user);
                 startActivity(intent);
             }
         });
@@ -158,7 +151,7 @@ public class RestaurantActivity extends AppCompatActivity {
             if (params[0].equals("Menu"))
                 request = "http://10.0.2.2:5000/get_dish?restaurant=" + id;
             else
-                request = "http://10.0.2.2:5000/recommend_dish?user=" + user + "&restaurant=" + id;
+                request = "http://10.0.2.2:5000/recommend_dish?user=" + HomeActivity.getUser() + "&restaurant=" + id;
 
             return Utils.sendHTTPRequest(request, "GET");
         }
