@@ -9,7 +9,7 @@
         android:title="Menu"
         android:orderInCategory="100"
         android:layout_alignParentRight="true"
-        app:showAsAction="always"
+        app:showAsAction="never"
         />
 
     <item
@@ -17,7 +17,7 @@
         android:title="Recommendations"
         android:orderInCategory="200"
         android:layout_alignParentRight="true"
-        app:showAsAction="always"
+        app:showAsAction="never"
         />
 
     <item
@@ -25,6 +25,6 @@
         android:title="Similar Restaurants"
         android:orderInCategory="200"
         android:layout_alignParentRight="true"
-        app:showAsAction="always"
+        app:showAsAction="never"
         />
 </menu>

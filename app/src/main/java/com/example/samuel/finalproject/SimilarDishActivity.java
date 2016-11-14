@@ -73,19 +73,7 @@ public class SimilarDishActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String message) {
-            dishes = new ArrayList<>();
-            message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-            String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-            for (String split : splits) {
-                split = split.replace("\\", "");
-                try {
-                    JSONObject dish = new JSONObject(split + "}");
-                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
-                            dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
-                } catch (Exception e) {
-                    continue;
-                }
-            }
+            dishes = Utils.parseDishList(message);
             refreshListView();
         }
     }

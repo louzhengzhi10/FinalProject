@@ -30,6 +30,7 @@ public class HomeActivity extends AppCompatActivity {
     private ListView listView;
     private List<Dish> dishes;
     private List<Restaurant> restaurants;
+    private boolean search_restaurant = true;
     private EditText searchText;
     private ImageView searchButton;
 
@@ -57,7 +58,10 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                new RestaurantTask().execute(charSequence.toString());
+                if (search_restaurant)
+                    new SearchRestaurantTask().execute(charSequence.toString());
+                else
+                    new SearchDishTask().execute(charSequence.toString());
             }
 
             @Override
@@ -65,6 +69,8 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+
+        onSearchRestaurantSelected();
     }
 
     @Override
@@ -83,8 +89,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_restaurant:
-                onRestaurantSelected();
+            case R.id.action_search_restaurant:
+                onSearchRestaurantSelected();
+                break;
+            case R.id.action_search_dish:
+                onSearchDishSelected();
                 break;
             case R.id.action_liked_dish:
                 onLikedDishSelected();
@@ -95,11 +104,22 @@ public class HomeActivity extends AppCompatActivity {
         return true;
     }
 
-    private void onRestaurantSelected() {
+    private void onSearchRestaurantSelected() {
         searchText.setVisibility(View.VISIBLE);
+        searchText.setHint("Restaurant");
         searchButton.setVisibility(View.VISIBLE);
         restaurants = new ArrayList<>();
+        search_restaurant = true;
         refreshRestaurantListView();
+    }
+
+    private void onSearchDishSelected() {
+        searchText.setVisibility(View.VISIBLE);
+        searchText.setHint("Dish");
+        searchButton.setVisibility(View.VISIBLE);
+        dishes = new ArrayList<>();
+        search_restaurant = false;
+        refreshDishListView();
     }
 
     private void onLikedDishSelected() {
@@ -136,12 +156,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private String[] splitString(String message) {
-        message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-        return message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-    }
-
-    private class RestaurantTask extends AsyncTask<String, Void, String> {
+    private class SearchRestaurantTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
             String request = "http://10.0.2.2:5000/match_restaurant?restaurant=" + params[0];
@@ -150,23 +165,25 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String message) {
-            restaurants = new ArrayList<>();
-            String[] splits = splitString(message);
-            for (String split : splits) {
-                split = split.replace("\\", "");
-                try {
-                    JSONObject restaurnat = new JSONObject(split + "}");
-                    restaurants.add(new Restaurant(restaurnat.getInt("id"),
-                            restaurnat.getString("name"), restaurnat.getString("address")));
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            restaurants = Utils.parseRestaurantList(message);
             refreshRestaurantListView();
         }
-
     }
+
+    private class SearchDishTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String[] params) {
+            String request = "http://10.0.2.2:5000/match_dish?dish=" + params[0];
+            return Utils.sendHTTPRequest(request, "GET");
+        }
+
+        @Override
+        protected void onPostExecute(String message) {
+            dishes = Utils.parseDishList(message);
+            refreshRestaurantListView();
+        }
+    }
+
 
     private class LikedDishTask extends AsyncTask<String, Void, String> {
         @Override
@@ -178,18 +195,7 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String message) {
-            dishes = new ArrayList<>();
-            String[] splits = splitString(message);
-            for (String split : splits) {
-                split = split.replace("\\", "");
-                try {
-                    JSONObject dish = new JSONObject(split + "}");
-                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
-                            dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
-                } catch (Exception e) {
-                    continue;
-                }
-            }
+            dishes = Utils.parseDishList(message);
             refreshDishListView();
         }
     }

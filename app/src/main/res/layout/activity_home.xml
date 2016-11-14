@@ -6,7 +6,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Restaurant: "
+        android:hint=""
         android:id="@+id/search_txt"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"

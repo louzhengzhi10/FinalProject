@@ -5,11 +5,19 @@
     android:layout_width="100dp"
     android:layout_height="wrap_content">
     <item
-        android:id="@+id/action_restaurant"
-        android:title="Restaurants"
+        android:id="@+id/action_search_restaurant"
+        android:title="Search Restaurant"
         android:orderInCategory="100"
         android:layout_alignParentRight="true"
-        app:showAsAction="always"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_search_dish"
+        android:title="Search Dish"
+        android:orderInCategory="200"
+        android:layout_alignParentRight="true"
+        app:showAsAction="never"
         />
 
     <item
@@ -17,6 +25,6 @@
         android:title="Liked Dishes"
         android:orderInCategory="200"
         android:layout_alignParentRight="true"
-        app:showAsAction="always"
+        app:showAsAction="never"
         />
 </menu>

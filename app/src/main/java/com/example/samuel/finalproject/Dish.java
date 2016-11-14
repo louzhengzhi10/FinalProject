@@ -5,11 +5,11 @@ package com.example.samuel.finalproject;
  */
 
 public class Dish {
-    private int id = -1;
-    private String name = null;
+    private int id;
+    private String name;
     private float price;
     private int restaurant_id;
-    private String restaurant_name;
+    private String restaurant_name = null;
 
     public Dish(int id, String name, float price) {
         this.id = id;

@@ -112,20 +112,7 @@ public class RestaurantActivity extends AppCompatActivity {
          */
         @Override
         protected void onPostExecute(String message) {
-            restaurants = new ArrayList<>();
-            try {
-                message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-                String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-                for (String split : splits) {
-                    split = split.replace("\\", "");
-                    JSONObject restaurant = new JSONObject(split + "}");
-                    restaurants.add(new Restaurant(restaurant.getInt("id"), restaurant.getString("name"), restaurant.getString("address")));
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            // refresh list view
+            restaurants = Utils.parseRestaurantList(message);
             refreshRestaurantListView();
         }
     }
@@ -171,20 +158,7 @@ public class RestaurantActivity extends AppCompatActivity {
          */
         @Override
         protected void onPostExecute(String message) {
-            dishes = new ArrayList<>();
-            try {
-                // parse response
-                message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-                String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-                for (String split : splits) {
-                    split = split.replace("\\", "");
-                    JSONObject dish = new JSONObject(split + "}");
-                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price")));
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+            dishes = Utils.parseDishList(message);
             // refresh list view
             refreshDishListView();
         }

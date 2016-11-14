@@ -55,7 +55,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         TextView restaurantText = (TextView) view.findViewById(R.id.dish_restaurant);
 
         // listener to on click event to restaurant name text
-        if (context instanceof SimilarDishActivity || context instanceof HomeActivity) {
+        if (dish.getRestaurant_name() != null) {
             restaurantText.setText(dish.getRestaurant_name());
             restaurantText.setOnClickListener(new View.OnClickListener() {
                 @Override
