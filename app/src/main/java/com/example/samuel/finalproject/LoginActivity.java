@@ -29,10 +29,22 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static android.Manifest.permission.READ_CONTACTS;
+import static android.R.attr.id;
+import static com.example.samuel.finalproject.R.id.email;
 
 /**
  * A login screen that offers login via email/password.
@@ -67,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(email);
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -199,7 +211,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            mAuthTask.execute((String) null);
         }
     }
     private boolean isEmailValid(String email) {
@@ -315,7 +327,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<String, Void, String> {
 
         private final String mEmail;
         private final String mPassword;
@@ -325,39 +337,56 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mPassword = password;
         }
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+        protected String doInBackground(String[] params) {
+            // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
+            String request;
+            request = "http://10.0.2.2:5000/signin?email=" + mEmail + "&password=" + mPassword;
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
+                URL url = new URL(request);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
                 }
-            }
+                in.close();
 
-            // TODO: register the new account here.
-            return true;
+                return response.toString();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+        protected void onPostExecute(String message) {
+            try {
+                // parse response
+                message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
+                String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
+                String split = splits[0];
+                split = split.replace("\\", "");
+                JSONObject info = new JSONObject(split + "}");
+                if (info.isNull("message")) {
+                    String mEmail = info.getString("email");
+                    String mName = info.getString("name");
+                    Intent fp=new Intent(LoginActivity.this, HomeActivity.class);
+                    startActivity(fp);
+                } else {
+                    String mMessage = info.getString("message");
+                    Toast.makeText(LoginActivity.this, info.getString("message"), Toast.LENGTH_SHORT).show();
+                    Intent fp=new Intent(LoginActivity.this, LoginActivity.class);
+                    startActivity(fp);
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
             }
         }
 

@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -93,19 +94,23 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String message) {
-            message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-            String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-            for (String split : splits) {
-                split = split.replace("\\", "");
-                try {
-                    JSONObject dish = new JSONObject(split + "}");
-                    dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
-                            dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
-                } catch (Exception e) {
-                    continue;
+            if (message.indexOf("{") == -1) {
+                Toast.makeText(HomeActivity.this, "You haven't liked any dish yet", Toast.LENGTH_SHORT).show();
+            } else {
+                message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
+                String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
+                for (String split : splits) {
+                    split = split.replace("\\", "");
+                    try {
+                        JSONObject dish = new JSONObject(split + "}");
+                        dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
+                                dish.getInt("restaurant_id"), dish.getString("restaurant_name")));
+                    } catch (Exception e) {
+                        continue;
+                    }
                 }
+                refreshListView();
             }
-            refreshListView();
         }
     }
 }
