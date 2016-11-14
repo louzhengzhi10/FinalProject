@@ -19,4 +19,12 @@
         android:layout_alignParentRight="true"
         app:showAsAction="always"
         />
+
+    <item
+        android:id="@+id/action_similar_restaurant"
+        android:title="Similar Restaurants"
+        android:orderInCategory="200"
+        android:layout_alignParentRight="true"
+        app:showAsAction="always"
+        />
 </menu>

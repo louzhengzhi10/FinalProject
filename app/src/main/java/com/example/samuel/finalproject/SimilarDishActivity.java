@@ -3,20 +3,13 @@ package com.example.samuel.finalproject;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -28,7 +21,7 @@ import java.util.regex.Pattern;
 public class SimilarDishActivity extends AppCompatActivity {
     private int id;
     private ListView listView;
-    private List<Dish> dishes = new ArrayList<>();
+    private List<Dish> dishes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +73,7 @@ public class SimilarDishActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String message) {
+            dishes = new ArrayList<>();
             message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
             String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
             for (String split : splits) {

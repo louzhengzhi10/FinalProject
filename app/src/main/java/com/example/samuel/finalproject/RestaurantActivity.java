@@ -3,7 +3,6 @@ package com.example.samuel.finalproject;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,11 +13,6 @@ import android.widget.ListView;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -33,7 +27,8 @@ public class RestaurantActivity extends AppCompatActivity {
     private String name;
     private String user = "mliu60@illinois.edu";
     private ListView listView;
-    private List<Dish> dishes = new ArrayList<>();
+    private List<Dish> dishes;
+    private List<Restaurant> restaurants;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,18 +75,67 @@ public class RestaurantActivity extends AppCompatActivity {
             case R.id.action_recommendation:
                 new SearchMenuTask().execute("Recommendation");
                 break;
+            case R.id.action_similar_restaurant:
+                new SimilarRestaurantTask().execute();
             default:
                 break;
         }
         return true;
     }
 
+    private void refreshRestaurantListView() {
+        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, "mliu60@illinois.edu");
+        listView = (ListView)findViewById(R.id.restaurant_activity_list);
+        listView.setAdapter(adapter);
+        // listener to on click event on dish button
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), RestaurantActivity.class);
+                intent.putExtra("restaurant_id", restaurants.get(position).getId());
+                startActivity(intent);
+            }
+        });
+    }
+
+    private class SimilarRestaurantTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String[] params) {
+            String request;
+            request = "http://10.0.2.2:5000/similar_restaurant?restaurant=" + id;
+            return Utils.sendHTTPRequest(request, "GET");
+        }
+
+        /**
+         * Parse response from server, and refresh list view
+         * @param message
+         */
+        @Override
+        protected void onPostExecute(String message) {
+            restaurants = new ArrayList<>();
+            try {
+                message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
+                String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
+                for (String split : splits) {
+                    split = split.replace("\\", "");
+                    JSONObject restaurant = new JSONObject(split + "}");
+                    restaurants.add(new Restaurant(restaurant.getInt("id"), restaurant.getString("name"), restaurant.getString("address")));
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            // refresh list view
+            refreshRestaurantListView();
+        }
+    }
+
     /**
      * Generate list view, called on post execute
      */
-    private void refreshListView() {
+    private void refreshDishListView() {
         DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, "mliu60@illinois.edu");
-        listView = (ListView)findViewById(R.id.dish_list);
+        listView = (ListView)findViewById(R.id.restaurant_activity_list);
         listView.setAdapter(adapter);
         // listener to on click event on dish button
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -108,6 +152,7 @@ public class RestaurantActivity extends AppCompatActivity {
      * Asynchronous task used to send http request to backend server
      */
     private class SearchMenuTask extends AsyncTask<String, Void, String> {
+        @Override
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request;
@@ -141,7 +186,7 @@ public class RestaurantActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             // refresh list view
-            refreshListView();
+            refreshDishListView();
         }
     }
 }
