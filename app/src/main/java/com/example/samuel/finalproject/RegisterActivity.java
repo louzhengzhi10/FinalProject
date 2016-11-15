@@ -93,26 +93,8 @@ public class RegisterActivity extends Activity {
 
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request = "http://10.0.2.2:5000/signup?email=" + mEmail + "&password=" + mPassword + "&name=" + mName;
-            try {
-                URL url = new URL(request);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+            String request = "http://10.0.2.2:5000/signup?email=" + mEmail + "&password=" + mPassword + "&name=" + mName.replace(" ", "+");
+            return Utils.sendHTTPRequest(request, "POST");
         }
 
         @Override
