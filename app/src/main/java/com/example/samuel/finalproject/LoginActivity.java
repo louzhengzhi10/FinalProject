@@ -359,29 +359,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request;
-            request = "http://10.0.2.2:5000/signin?email=" + mEmail + "&password=" + mPassword;
-
-            try {
-                URL url = new URL(request);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+            String request = "http://10.0.2.2:5000/signin?email=" + mEmail + "&password=" + mPassword;
+            return Utils.sendHTTPRequest(request, "GET");
         }
 
         @Override
@@ -396,7 +375,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if (info.isNull("message")) {
                     String mEmail = info.getString("email");
                     String mName = info.getString("name");
-                    Intent fp=new Intent(LoginActivity.this, HomeActivity.class);
+                    Intent fp = new Intent(LoginActivity.this, HomeActivity.class);
+                    fp.putExtra("user", mEmail);
                     startActivity(fp);
                 } else {
                     String mMessage = info.getString("message");
