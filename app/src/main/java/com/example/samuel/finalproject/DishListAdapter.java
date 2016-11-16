@@ -14,6 +14,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -42,7 +43,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         TextView nameText = (TextView) view.findViewById(R.id.dish_name);
         nameText.setText(dish.getName());
         TextView priceText = (TextView) view.findViewById(R.id.dish_price);
-        priceText.setText("$" + dish.getPrice());
+        priceText.setText(NumberFormat.getCurrencyInstance().format(dish.getPrice()));
 
         TextView restaurantText = (TextView) view.findViewById(R.id.dish_restaurant);
 

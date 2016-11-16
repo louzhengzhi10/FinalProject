@@ -382,6 +382,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     String mMessage = info.getString("message");
                     Toast.makeText(LoginActivity.this, info.getString("message"), Toast.LENGTH_SHORT).show();
                     Intent fp=new Intent(LoginActivity.this, LoginActivity.class);
+                    fp.putExtra("user", mEmail);
                     startActivity(fp);
                 }
             }

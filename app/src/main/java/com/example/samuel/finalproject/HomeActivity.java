@@ -25,7 +25,7 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
     public static HashSet<Integer> likeID;
-    private static String user = "mliu60@illinois.edu";
+    private static String user;
 
     private ListView listView;
     private List<Dish> dishes;
@@ -39,6 +39,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        user = getIntent().getExtras().getString("user");
         likeID = new HashSet<>();
 
         searchText = (EditText) findViewById(R.id.search_txt);
@@ -124,6 +125,12 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.action_liked_dish:
                 onLikedDishSelected();
                 break;
+            case R.id.action_history:
+                onHistorySelected();
+                break;
+            case R.id.action_share:
+                onShareSelected();
+                break;
             case R.id.action_sign_out:
                 startActivity(new Intent(this, LoginActivity.class));
                 break;
@@ -155,6 +162,18 @@ public class HomeActivity extends AppCompatActivity {
         searchText.setVisibility(View.INVISIBLE);
         searchButton.setVisibility(View.INVISIBLE);
         new LikedDishTask().execute();
+    }
+
+    private void onHistorySelected() {
+        searchText.setVisibility(View.INVISIBLE);
+        searchButton.setVisibility(View.INVISIBLE);
+        new HistoryTask().execute();
+    }
+
+    private void onShareSelected() {
+        searchText.setVisibility(View.INVISIBLE);
+        searchButton.setVisibility(View.INVISIBLE);
+        new GetSharedTask().execute();
     }
 
     private void refreshRestaurantListView() {
@@ -190,7 +209,7 @@ public class HomeActivity extends AppCompatActivity {
     private class SearchRestaurantTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
-            String request = "http://10.0.2.2:5000/match_restaurant?restaurant=" + params[0].replace(" ", "+");
+            String request = "http://10.0.2.2:5000/match_restaurant?user=" + user + "&restaurant=" + params[0].replace(" ", "+");
             return Utils.sendHTTPRequest(request, "GET");
         }
 
@@ -243,5 +262,37 @@ public class HomeActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    private class HistoryTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String[] params) {
+            // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
+            String request = "http://10.0.2.2:5000/get_history?user=" + user;
+            return Utils.sendHTTPRequest(request, "GET");
+        }
+
+        @Override
+        protected void onPostExecute(String message) {
+            dishes = Utils.parseDishList(message);
+            refreshDishListView();
+        }
+    }
+
+    private class GetSharedTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String[] params) {
+            // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
+            String request = "http://10.0.2.2:5000/get_shared?user=" + user;
+            return Utils.sendHTTPRequest(request, "GET");
+        }
+
+        @Override
+        protected void onPostExecute(String message) {
+            dishes = Utils.parseDishList(message);
+            refreshDishListView();
+        }
+    }
+
+
 }
 

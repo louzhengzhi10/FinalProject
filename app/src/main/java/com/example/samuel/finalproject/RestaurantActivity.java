@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static android.R.id.message;
+
 
 /**
  * Created by mengxiongliu on 05/11/2016.
@@ -68,6 +70,9 @@ public class RestaurantActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, HomeActivity.class);
                 intent.putExtra("user", HomeActivity.getUser());
                 startActivity(intent);
+                break;
+            case R.id.action_three:
+                new SearchMenuTask().execute("Three");
                 break;
             case R.id.action_menu:
                 new SearchMenuTask().execute("Menu");
@@ -132,8 +137,10 @@ public class RestaurantActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
+                Intent intent = new Intent(getApplicationContext(), DishInfoActivity.class);
+                intent.putExtra("dish_name", dishes.get(position).getName());
                 intent.putExtra("dish_id", dishes.get(position).getId());
+                intent.putExtra("user", HomeActivity.getUser());
                 startActivity(intent);
             }
         });
@@ -150,8 +157,10 @@ public class RestaurantActivity extends AppCompatActivity {
             // send get_dish / recommend_dish request
             if (params[0].equals("Menu"))
                 request = "http://10.0.2.2:5000/get_dish?restaurant=" + id;
-            else
+            else if (params[0].equals("Recommendation"))
                 request = "http://10.0.2.2:5000/recommend_dish?user=" + HomeActivity.getUser() + "&restaurant=" + id;
+            else
+                request = "http://10.0.2.2:5000/recommend_dish?user=" + HomeActivity.getUser() + "&restaurant=" + id + "&limit=3";
 
             return Utils.sendHTTPRequest(request, "GET");
         }
