@@ -57,8 +57,19 @@ public class RegisterActivity extends Activity {
                     final String email = mEmailView.getText().toString();
                     final String password = mPasswordView.getText().toString();
                     final String name = mNameView.getText().toString();
-                    new RegisterTask(email, password, name).execute();
-                    return true;
+                    if (checkEmail(email) == false) {
+                        Toast.makeText(RegisterActivity.this, "Your email address is invalid", Toast.LENGTH_SHORT).show();
+                        return false;
+                    } else if (checkPassword(password) == false) {
+                        Toast.makeText(RegisterActivity.this, "Your password is invalid", Toast.LENGTH_SHORT).show();
+                        return false;
+                    } else if (checkName(name) == false) {
+                        Toast.makeText(RegisterActivity.this, "Your name is invalid", Toast.LENGTH_SHORT).show();
+                        return false;
+                    } else {
+                        new RegisterTask(email, password, name).execute();
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -71,13 +82,68 @@ public class RegisterActivity extends Activity {
                 final String email = mEmailView.getText().toString();
                 final String password = mPasswordView.getText().toString();
                 final String name = mNameView.getText().toString();
-                new RegisterTask(email, password, name).execute();
+                if (checkEmail(email) == false) {
+                    Toast.makeText(RegisterActivity.this, "Your email address is invalid", Toast.LENGTH_SHORT).show();
+                } else if (checkPassword(password) == false) {
+                    Toast.makeText(RegisterActivity.this, "Your password is invalid", Toast.LENGTH_SHORT).show();
+                } else if (checkName(name) == false) {
+                    Toast.makeText(RegisterActivity.this, "Your name is invalid", Toast.LENGTH_SHORT).show();
+                } else {
+                    new RegisterTask(email, password, name).execute();
+                }
             }
         });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
+    private boolean checkEmail(String email) {
+        // Attack Prevention
+        if (email.contains("?")) {
+            return false;
+        } else if (email.contains("/")){
+            return false;
+        } else if (email.contains("=")) {
+            return false;
+        } else if (email.contains(":")) {
+            return false;
+        } else {
+            return email.contains("@") && email.contains(".");
+        }
+
+    }
+
+    private boolean checkPassword(String password) {
+        // Attack Prevention
+        if (password.length() < 6) {
+            return false;
+        } else if (password.contains("@")) {
+            return false;
+        } else if (password.contains("?")) {
+            return false;
+        } else if (password.contains("/")){
+            return false;
+        } else if (password.contains("=")) {
+            return false;
+        } else if (password.contains(":")) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkName(String name) {
+        char[] chars = name.toCharArray();
+
+        for (char c : chars) {
+            if(!Character.isLetter(c)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     private class RegisterTask extends AsyncTask<String, Void, String> {
         private final String mEmail;
@@ -123,13 +189,16 @@ public class RegisterActivity extends Activity {
                 split = split.replace("\\", "");
                 try {
                     JSONObject dish = new JSONObject(split + "}");
-                    Toast.makeText(RegisterActivity.this, dish.getString("message"), Toast.LENGTH_SHORT).show();
+                    if (dish.getString("message").equals("Sign up success")) {
+                        Intent fp = new Intent(RegisterActivity.this, LoginActivity.class);
+                        startActivity(fp);
+                    } else {
+                        Toast.makeText(RegisterActivity.this, dish.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
                 } catch (Exception e) {
                     continue;
                 }
             }
-            Intent fp = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(fp);
         }
     }
 }
