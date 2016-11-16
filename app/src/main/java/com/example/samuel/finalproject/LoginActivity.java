@@ -215,13 +215,33 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
     private boolean isEmailValid(String email) {
-        return email.contains("@") && email.contains(".");
+        // Attack Prevention
+        if (email.contains("?")) {
+            return false;
+        } else if (email.contains("/")){
+            return false;
+        } else if (email.contains("=")) {
+            return false;
+        } else if (email.contains(":")) {
+            return false;
+        } else {
+            return email.contains("@") && email.contains(".");
+        }
     }
 
     private boolean isPasswordValid(String password) {
+        // Attack Prevention
         if (password.length() < 6) {
             return false;
         } else if (password.contains("@")) {
+            return false;
+        } else if (password.contains("?")) {
+            return false;
+        } else if (password.contains("/")){
+            return false;
+        } else if (password.contains("=")) {
+            return false;
+        } else if (password.contains(":")) {
             return false;
         }
         return true;
