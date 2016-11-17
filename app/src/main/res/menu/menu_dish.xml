@@ -13,6 +13,22 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_dish_info"
+        android:title="Dish Info"
+        android:orderInCategory="200"
+        android:layout_alignParentRight="true"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_similar_dish"
+        android:title="Similar Dish"
+        android:orderInCategory="200"
+        android:layout_alignParentRight="true"
+        app:showAsAction="never"
+        />
+
+    <item
         android:id="@+id/action_sign_out"
         android:title="Sign Out"
         android:orderInCategory="200"

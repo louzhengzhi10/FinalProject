@@ -198,9 +198,8 @@ public class HomeActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
-                intent.putExtra("dish_id", dishes.get(position).getId());
-                intent.putExtra("user", user);
+                Intent intent = new Intent(getApplicationContext(), DishInfoActivity.class);
+                intent.putExtra("dish", dishes.get(position));
                 startActivity(intent);
             }
         });

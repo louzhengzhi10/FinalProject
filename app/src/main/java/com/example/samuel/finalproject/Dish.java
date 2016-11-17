@@ -1,10 +1,12 @@
 package com.example.samuel.finalproject;
 
+import java.io.Serializable;
+
 /**
  * Created by mengxiongliu on 07/11/2016.
  */
 
-public class Dish {
+public class Dish implements Serializable {
     private int id;
     private String name;
     private float price;

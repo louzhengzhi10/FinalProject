@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,10 +34,7 @@ import static com.example.samuel.finalproject.R.id.dish_name;
 import static com.example.samuel.finalproject.R.id.email;
 
 public class DishInfoActivity extends AppCompatActivity {
-
-    private String dish_name_string;
-    private int dish_id;
-    private String user;
+    private Dish dish;
     private LinearLayout mShareLayout;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -47,31 +47,30 @@ public class DishInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dish_info);
 
-        dish_id = getIntent().getExtras().getInt("dish_id");
-        dish_name_string = getIntent().getExtras().getString("dish_name");
-        user = getIntent().getExtras().getString("user");
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        catch(NullPointerException ex) {
+            ex.printStackTrace();
+        }
+
+        dish = (Dish) getIntent().getExtras().getSerializable("dish");
         mShareLayout = (LinearLayout) findViewById(R.id.share_friend);
 
         TextView dishText = (TextView) findViewById(R.id.dish_name);
-        dishText.setText(dish_name_string);
+        dishText.setText(dish.getName());
 
-        int j = getResources().getIdentifier("dish" + dish_id, "drawable", getPackageName());
+        int j = getResources().getIdentifier("dish" + dish.getId(), "drawable", getPackageName());
         ImageView dishImage = (ImageView) findViewById(R.id.dish_image);
         dishImage.setImageResource(j);
-
-        Button mSimilarButton = (Button) findViewById(R.id.similar_button);
-        mSimilarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                find_similar_dishes();
-            }
-        });
 
         Button mHistoryButton = (Button) findViewById(R.id.eaten_button);
         mHistoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DishInfoActivity.EatenTask(user, dish_id).execute();
+                new DishInfoActivity.EatenTask(dish.getId()).execute();
             }
         });
 
@@ -93,32 +92,60 @@ public class DishInfoActivity extends AppCompatActivity {
         mSubmitShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DishInfoActivity.ShareTask(mShareTo.getText().toString(), dish_id).execute();
+                new DishInfoActivity.ShareTask(mShareTo.getText().toString(), dish.getId()).execute();
             }
         });
     }
 
-    private void find_similar_dishes() {
-        Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
-        intent.putExtra("dish_id", dish_id);
-        intent.putExtra("user", user);
-        startActivity(intent);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_dish, menu);
+        return true;
     }
 
+
+    @Override
+    public boolean onSupportNavigateUp(){
+        onBackPressed();
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_home:
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                intent.putExtra("user", HomeActivity.getUser());
+                startActivity(intent);
+                break;
+            case R.id.action_similar_dish:
+                intent = new Intent(this, SimilarDishActivity.class);
+                intent.putExtra("dish", dish);
+                startActivity(intent);
+                break;
+            case R.id.action_sign_out:
+                startActivity(new Intent(this, LoginActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+
     private class EatenTask extends AsyncTask<String, Void, String> {
-        private final String mEmail;
         private final int mDish;
 
-        EatenTask(String user, int dishID) {
-            mEmail = user;
+        EatenTask(int dishID) {
             mDish = dishID;
         }
 
 
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request = "http://10.0.2.2:5000/set_history?email=" + mEmail + "&dish=" + mDish;
-            return Utils.sendHTTPRequest(request, "GET");
+            String request = "http://10.0.2.2:5000/set_history?user=" + HomeActivity.getUser() + "&dish=" + mDish;
+            return Utils.sendHTTPRequest(request, "POST");
         }
 
         @Override
@@ -149,8 +176,8 @@ public class DishInfoActivity extends AppCompatActivity {
 
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request = "http://10.0.2.2:5000/share_dish?dish_id=" + mDish + "&from_user=" + user + "&to_user=" + mRecipient;
-            return Utils.sendHTTPRequest(request, "GET");
+            String request = "http://10.0.2.2:5000/share_dish?dish=" + mDish + "&from_user=" + HomeActivity.getUser() + "&to_user=" + mRecipient;
+            return Utils.sendHTTPRequest(request, "POST");
         }
 
         @Override

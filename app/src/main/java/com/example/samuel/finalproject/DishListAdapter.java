@@ -65,6 +65,8 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         ImageView likeView = (ImageView) view.findViewById(R.id.like_dish_icon);
         if (dish.isLiked())
             likeView.setImageResource(R.drawable.liked);
+        else
+            likeView.setImageResource(R.drawable.like);
         // listener to on click event to like icon
         likeView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -18,8 +18,7 @@ import java.util.List;
  */
 
 public class SimilarDishActivity extends AppCompatActivity {
-    private int id;
-    private String user;
+    private Dish dish;
     private ListView listView;
     private List<Dish> dishes;
 
@@ -28,8 +27,7 @@ public class SimilarDishActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_similar_dish);
 
-        id = getIntent().getExtras().getInt("dish_id");
-        user = getIntent().getExtras().getString("user");
+        dish = (Dish) getIntent().getExtras().getSerializable("dish");
 
         try {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -46,7 +44,7 @@ public class SimilarDishActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_custom, menu);
+        inflater.inflate(R.menu.menu_dish, menu);
         return true;
     }
 
@@ -62,7 +60,12 @@ public class SimilarDishActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_home:
                 Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                intent.putExtra("user", user);
+                intent.putExtra("user", HomeActivity.getUser());
+                startActivity(intent);
+                break;
+            case R.id.action_dish_info:
+                intent = new Intent(this, DishInfoActivity.class);
+                intent.putExtra("dish", dish);
                 startActivity(intent);
                 break;
             case R.id.action_sign_out:
@@ -85,9 +88,8 @@ public class SimilarDishActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), SimilarDishActivity.class);
-                intent.putExtra("dish_id", dishes.get(position).getId());
-                intent.putExtra("user", user);
+                Intent intent = new Intent(getApplicationContext(), DishInfoActivity.class);
+                intent.putExtra("dish", dishes.get(position));
                 startActivity(intent);
             }
         });
@@ -96,7 +98,7 @@ public class SimilarDishActivity extends AppCompatActivity {
     private class SimilarDishTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request = "http://10.0.2.2:5000/similar_dish?dish=" + id;
+            String request = "http://10.0.2.2:5000/similar_dish?dish=" + dish.getId();
             return Utils.sendHTTPRequest(request, "GET");
         }
 
