@@ -46,37 +46,4 @@ public class RestaurantListAdapter extends ArrayAdapter<Restaurant> {
         // listener to on click event to like icon
         return view;
     }
-
-    private class CountTask extends AsyncTask<String, Integer, String> {
-        private final String mEmail;
-        private final int mRestaurant;
-
-        CountTask(String user, int restaurantID) {
-            mEmail = user;
-            mRestaurant = restaurantID;
-        }
-
-
-        protected String doInBackground(String[] params) {
-            // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request = "http://10.0.2.2:5000/liked_in_rest?email=" + mEmail + "&restaurant=" + mRestaurant;
-            return Utils.sendHTTPRequest(request, "GET");
-        }
-
-        @Override
-        protected void onPostExecute(String message) {
-            message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-            String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-            for (String split : splits) {
-                split = split.replace("\\", "");
-                try {
-                    JSONObject dish = new JSONObject(split + "}");
-                    dish.getInt("num_dishes");
-                } catch (Exception e) {
-                    continue;
-                }
-            }
-        }
-    }
-
 }

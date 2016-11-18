@@ -133,7 +133,9 @@ public class DishInfoActivity extends AppCompatActivity {
         return true;
     }
 
-
+    /**
+     * Send history request to backend server
+     */
     private class EatenTask extends AsyncTask<String, Void, String> {
         private final int mDish;
 
@@ -164,6 +166,9 @@ public class DishInfoActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Send share dish request to backend server
+     */
     private class ShareTask extends AsyncTask<String, Void, String> {
         private final String mRecipient;
         private final int mDish;

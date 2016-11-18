@@ -95,6 +95,9 @@ public class SimilarDishActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Retrieve similar dishes from backend server
+     */
     private class SimilarDishTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead

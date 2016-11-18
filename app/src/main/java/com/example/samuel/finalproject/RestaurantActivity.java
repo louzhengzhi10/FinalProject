@@ -71,9 +71,6 @@ public class RestaurantActivity extends AppCompatActivity {
                 intent.putExtra("user", HomeActivity.getUser());
                 startActivity(intent);
                 break;
-            case R.id.action_three:
-                new SearchMenuTask().execute("Three");
-                break;
             case R.id.action_menu:
                 new SearchMenuTask().execute("Menu");
                 break;

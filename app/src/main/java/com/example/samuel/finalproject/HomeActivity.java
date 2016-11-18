@@ -24,6 +24,7 @@ import java.util.List;
  */
 
 public class HomeActivity extends AppCompatActivity {
+    // used for like, unlike icon in dish list view, accessed from all other activities
     public static HashSet<Integer> likeID;
     private static String user;
 
@@ -54,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // match restaurant or dish on text change
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -74,6 +76,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        // initialize likedID
         try {
             new LikedIDTask().execute().get();
         }
@@ -140,6 +143,9 @@ public class HomeActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Restaurant search item selected
+     */
     private void onSearchRestaurantSelected() {
         searchText.setVisibility(View.VISIBLE);
         searchText.setHint("Restaurant");
@@ -149,6 +155,9 @@ public class HomeActivity extends AppCompatActivity {
         refreshRestaurantListView();
     }
 
+    /**
+     * Dish search item selected
+     */
     private void onSearchDishSelected() {
         searchText.setVisibility(View.VISIBLE);
         searchText.setHint("Dish");
@@ -158,24 +167,36 @@ public class HomeActivity extends AppCompatActivity {
         refreshDishListView();
     }
 
+    /**
+     * Liked dish item selected
+     */
     private void onLikedDishSelected() {
         searchText.setVisibility(View.INVISIBLE);
         searchButton.setVisibility(View.INVISIBLE);
         new LikedDishTask().execute();
     }
 
+    /**
+     * History item selected
+     */
     private void onHistorySelected() {
         searchText.setVisibility(View.INVISIBLE);
         searchButton.setVisibility(View.INVISIBLE);
         new HistoryTask().execute();
     }
 
+    /**
+     * Share item selected
+     */
     private void onShareSelected() {
         searchText.setVisibility(View.INVISIBLE);
         searchButton.setVisibility(View.INVISIBLE);
         new GetSharedTask().execute();
     }
 
+    /**
+     * Inflate list view with restaurants
+     */
     private void refreshRestaurantListView() {
         RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants);
         listView = (ListView) findViewById(R.id.home_list);
@@ -191,6 +212,9 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Inflate list view with dishes
+     */
     private void refreshDishListView() {
         DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes);
         listView = (ListView) findViewById(R.id.home_list);
@@ -205,6 +229,9 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Match restaurants with name that contains the substring from backend server
+     */
     private class SearchRestaurantTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
@@ -219,6 +246,9 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Match dishes with name that contains the substring from backend server
+     */
     private class SearchDishTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
@@ -234,6 +264,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Retrieve all relevant information of liked dishes from backend server
+     */
     private class LikedDishTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
@@ -249,6 +282,9 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Retrieve IDs of liked dishes from backend server
+     */
     private class LikedIDTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
@@ -262,6 +298,9 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Retrieve history of user from backend server
+     */
     private class HistoryTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
@@ -277,6 +316,9 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Retrieve dishes shared to current user from backend server
+     */
     private class GetSharedTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {

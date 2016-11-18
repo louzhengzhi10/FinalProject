@@ -16,6 +16,12 @@ import java.util.regex.Pattern;
  */
 
 public class Utils {
+    /**
+     * HTTP request handler, catches all exceptions
+     * @param request
+     * @param method
+     * @return response string
+     */
     public static String sendHTTPRequest(String request, String method) {
         try {
             URL url = new URL(request);
@@ -39,6 +45,11 @@ public class Utils {
         return null;
     }
 
+    /**
+     * Split json string
+     * @param message
+     * @return
+     */
     private static String[] splitString(String message) {
         if (message == null || message.equals(""))
             return null;
@@ -46,6 +57,11 @@ public class Utils {
         return message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
     }
 
+    /**
+     * Parse message from backend server, return a list of dishes
+     * @param message
+     * @return
+     */
     public static List<Dish> parseDishList(String message) {
         List<Dish> dishes = new ArrayList<>();
         try {
@@ -73,6 +89,11 @@ public class Utils {
         return dishes;
     }
 
+    /**
+     * Parse message from backend server, return a list of restaurants
+     * @param message
+     * @return
+     */
     public static List<Restaurant> parseRestaurantList(String message) {
         List<Restaurant> restaurants = new ArrayList<>();
         try {
