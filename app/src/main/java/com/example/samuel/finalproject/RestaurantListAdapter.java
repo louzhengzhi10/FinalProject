@@ -42,7 +42,6 @@ public class RestaurantListAdapter extends ArrayAdapter<Restaurant> {
         TextView addressText = (TextView) view.findViewById(R.id.restaurant_address);
         addressText.setText(restaurant.getAddress());
         TextView NumDishText = (TextView) view.findViewById(R.id.restaurant_liked_dishes);
-        NumDishText.setText(restaurant.getAddress());
 
         // listener to on click event to like icon
         return view;
