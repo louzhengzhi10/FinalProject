@@ -127,7 +127,7 @@ public class RestaurantActivity extends AppCompatActivity {
      * Generate list view, called on post execute
      */
     private void refreshDishListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes);
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, false);
         listView = (ListView)findViewById(R.id.restaurant_activity_list);
         listView.setAdapter(adapter);
         // listener to on click event on dish button

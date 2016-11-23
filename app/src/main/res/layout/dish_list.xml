@@ -51,6 +51,13 @@
             android:layout_gravity="bottom"
             android:src="@drawable/like" />
 
+        <ImageView
+            android:id="@+id/delete_dish_icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="bottom"
+            android:src="@drawable/delete" />
+
     </LinearLayout>
 
     <TextView

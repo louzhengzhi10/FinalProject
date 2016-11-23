@@ -3,11 +3,15 @@ package com.example.samuel.finalproject;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.view.MotionEventCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,15 +29,17 @@ import java.util.concurrent.ExecutionException;
 public class DishListAdapter extends ArrayAdapter<Dish> {
     private List<Dish> dishes;
     private Activity context;
+    private boolean deleatable;
 
-    public DishListAdapter(Activity context, int resource, List<Dish> dishes) {
+    public DishListAdapter(Activity context, int resource, List<Dish> dishes, boolean deletable) {
         super(context, resource, dishes);
         this.dishes = dishes;
         this.context = context;
+        this.deleatable = deletable;
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup parent) {
+    public View getView(final int position, View view, ViewGroup parent) {
         if (view == null) {
             view = LayoutInflater.from(getContext()).inflate(R.layout.dish_list, parent, false);
         }
@@ -95,13 +101,28 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                 Toast.makeText(getContext(), response, Toast.LENGTH_SHORT).show();
             }
         });
+
+        ImageView deleteView = (ImageView) view.findViewById(R.id.delete_dish_icon);
+        if (deleatable) {
+            deleteView.setVisibility(View.VISIBLE);
+            deleteView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dishes.remove(position);
+                    notifyDataSetChanged();
+                }
+            });
+        }
+        else
+            deleteView.setVisibility(View.INVISIBLE);
+
         return view;
     }
 
     /**
      * Asynchronous task used to send http request to backend server
      */
-    public class LikeDishTask extends AsyncTask<String, Void, String> {
+    private class LikeDishTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request;

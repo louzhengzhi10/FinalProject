@@ -9,7 +9,9 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -164,7 +166,7 @@ public class HomeActivity extends AppCompatActivity {
         searchButton.setVisibility(View.VISIBLE);
         dishes = new ArrayList<>();
         search_restaurant = false;
-        refreshDishListView();
+        refreshDishListView(true);
     }
 
     /**
@@ -215,8 +217,9 @@ public class HomeActivity extends AppCompatActivity {
     /**
      * Inflate list view with dishes
      */
-    private void refreshDishListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes);
+    private void refreshDishListView(boolean deletable) {
+        DishListAdapter adapter;
+        adapter = new DishListAdapter(this, R.layout.dish_list, dishes, deletable);
         listView = (ListView) findViewById(R.id.home_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -259,7 +262,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshDishListView();
+            refreshDishListView(true);
         }
     }
 
@@ -278,7 +281,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshDishListView();
+            refreshDishListView(false);
         }
     }
 
@@ -312,7 +315,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshDishListView();
+            refreshDishListView(true);
         }
     }
 
@@ -330,7 +333,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshDishListView();
+            refreshDishListView(true);
         }
     }
 
