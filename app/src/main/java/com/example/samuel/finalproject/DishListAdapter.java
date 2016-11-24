@@ -30,12 +30,14 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
     private List<Dish> dishes;
     private Activity context;
     private boolean deleatable;
+    private String deleteType;
 
-    public DishListAdapter(Activity context, int resource, List<Dish> dishes, boolean deletable) {
+    public DishListAdapter(Activity context, int resource, List<Dish> dishes, boolean deletable, String deleteType) {
         super(context, resource, dishes);
         this.dishes = dishes;
         this.context = context;
         this.deleatable = deletable;
+        this.deleteType = deleteType;
     }
 
     @Override
@@ -108,6 +110,16 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
             deleteView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    String response = null;
+                    if (deleteType != null) {
+                        String request = "http://10.0.2.2:5000/remove_history?user=" + HomeActivity.getUser() + "&dish=" + dish.getId();
+                        try {
+                            response = new DeleteTask().execute(request, "POST").get();
+                        }
+                        catch (ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     dishes.remove(position);
                     notifyDataSetChanged();
                 }
@@ -119,10 +131,22 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         return view;
     }
 
+    private String parseMessage(String message) {
+        try {
+            message = message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1).replace("\\", "");
+            return new String(new JSONObject(message).getString("message"));
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * Asynchronous task used to send http request to backend server
      */
     private class LikeDishTask extends AsyncTask<String, Void, String> {
+        @Override
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request;
@@ -134,14 +158,15 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
 
             String message = Utils.sendHTTPRequest(request, "POST");
 
-            try {
-                message = message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1).replace("\\", "");
-                return new String(new JSONObject(message).getString("message"));
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return parseMessage(message);
+        }
+    }
+
+    private class DeleteTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String[] params) {
+            String message = Utils.sendHTTPRequest(params[0], params[1]);
+            return parseMessage(message);
         }
     }
 

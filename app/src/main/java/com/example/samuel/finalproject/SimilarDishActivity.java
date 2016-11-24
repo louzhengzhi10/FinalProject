@@ -82,7 +82,7 @@ public class SimilarDishActivity extends AppCompatActivity {
      * Generate list view, called on post execute
      */
     private void refreshListView() {
-        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, false);
+        DishListAdapter adapter = new DishListAdapter(this, R.layout.dish_list, dishes, false, null);
         listView = (ListView)findViewById(R.id.similar_dish_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

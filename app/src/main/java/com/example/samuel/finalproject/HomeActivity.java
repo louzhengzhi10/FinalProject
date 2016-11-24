@@ -166,7 +166,7 @@ public class HomeActivity extends AppCompatActivity {
         searchButton.setVisibility(View.VISIBLE);
         dishes = new ArrayList<>();
         search_restaurant = false;
-        refreshDishListView(true);
+        refreshDishListView(true, null);
     }
 
     /**
@@ -217,9 +217,9 @@ public class HomeActivity extends AppCompatActivity {
     /**
      * Inflate list view with dishes
      */
-    private void refreshDishListView(boolean deletable) {
+    private void refreshDishListView(boolean deletable, String deleteType) {
         DishListAdapter adapter;
-        adapter = new DishListAdapter(this, R.layout.dish_list, dishes, deletable);
+        adapter = new DishListAdapter(this, R.layout.dish_list, dishes, deletable, deleteType);
         listView = (ListView) findViewById(R.id.home_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -262,7 +262,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshDishListView(true);
+            refreshDishListView(true, null);
         }
     }
 
@@ -281,7 +281,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshDishListView(false);
+            refreshDishListView(false, null);
         }
     }
 
@@ -315,7 +315,8 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshDishListView(true);
+            String deleteType = "history";
+            refreshDishListView(true, deleteType);
         }
     }
 
@@ -333,7 +334,8 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             dishes = Utils.parseDishList(message);
-            refreshDishListView(true);
+            String deleteType = "shared";
+            refreshDishListView(true, deleteType);
         }
     }
 
