@@ -1,12 +1,17 @@
 package com.example.samuel.finalproject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,17 +30,18 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.regex.Pattern;
 
 import static android.R.attr.button;
+import static android.R.attr.theme;
 import static android.R.attr.x;
 import static com.example.samuel.finalproject.HomeActivity.getUser;
 import static com.example.samuel.finalproject.R.id.dish_name;
 import static com.example.samuel.finalproject.R.id.email;
 
-public class DishInfoActivity extends AppCompatActivity {
+public class DishInfoActivity extends AppCompatActivity implements Serializable {
     private Dish dish;
-    private LinearLayout mShareLayout;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -57,7 +63,6 @@ public class DishInfoActivity extends AppCompatActivity {
         }
 
         dish = (Dish) getIntent().getExtras().getSerializable("dish");
-        mShareLayout = (LinearLayout) findViewById(R.id.share_friend);
 
         TextView dishText = (TextView) findViewById(R.id.dish_name);
         dishText.setText(dish.getName());
@@ -79,20 +84,12 @@ public class DishInfoActivity extends AppCompatActivity {
         mShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mShareLayout.getVisibility() == View.INVISIBLE) {
-                    mShareLayout.setVisibility(View.VISIBLE);
-                } else {
-                    mShareLayout.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
-
-        final EditText mShareTo = (EditText) findViewById(R.id.friend_email);
-        final Button mSubmitShareButton = (Button) findViewById(R.id.confirm_share);
-        mSubmitShareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DishInfoActivity.ShareTask(mShareTo.getText().toString(), dish.getId()).execute();
+                ShareDialogFragment dialog = new ShareDialogFragment();
+                Bundle args = new Bundle();
+                args.putInt("dish", dish.getId());
+                args.putSerializable("activity", DishInfoActivity.this);
+                dialog.setArguments(args);
+                dialog.show(getSupportFragmentManager(), "Share Dialog");
             }
         });
     }
@@ -133,6 +130,15 @@ public class DishInfoActivity extends AppCompatActivity {
         return true;
     }
 
+    public void startShareTask(String to_user) {
+        try {
+            new ShareTask(to_user, dish.getId()).execute().get();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Send history request to backend server
      */
@@ -169,7 +175,7 @@ public class DishInfoActivity extends AppCompatActivity {
     /**
      * Send share dish request to backend server
      */
-    private class ShareTask extends AsyncTask<String, Void, String> {
+    public class ShareTask extends AsyncTask<String, Void, String> {
         private final String mRecipient;
         private final int mDish;
 
@@ -193,14 +199,42 @@ public class DishInfoActivity extends AppCompatActivity {
                 split = split.replace("\\", "");
                 try {
                     JSONObject dish = new JSONObject(split + "}");
-                    if (dish.getString("message").equals("Share Success")) {
-                        mShareLayout.setVisibility(View.INVISIBLE);
-                    }
                     Toast.makeText(DishInfoActivity.this, dish.getString("message"), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     continue;
                 }
             }
+        }
+    }
+
+    public static class ShareDialogFragment extends DialogFragment {
+        private DishInfoActivity activity;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            activity = (DishInfoActivity) getArguments().getSerializable("activity");
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            final View dialogView = inflater.inflate(R.layout.dialog_share, null);
+
+            builder.setView(dialogView);
+
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    EditText username = (EditText) dialogView.findViewById(R.id.share_dialog_username);
+                    EditText message = (EditText) dialogView.findViewById(R.id.share_dialog_message);
+                    activity.startShareTask(username.getText().toString());
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    DishInfoActivity.ShareDialogFragment.this.getDialog().cancel();
+                }
+            });
+            return builder.create();
         }
     }
 }
