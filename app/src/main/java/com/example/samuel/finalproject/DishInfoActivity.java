@@ -130,9 +130,9 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
         return true;
     }
 
-    public void startShareTask(String to_user) {
+    public void startShareTask(String to_user, String message) {
         try {
-            new ShareTask(to_user, dish.getId()).execute().get();
+            new ShareTask(to_user, dish.getId(), message).execute().get();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -178,16 +178,18 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
     public class ShareTask extends AsyncTask<String, Void, String> {
         private final String mRecipient;
         private final int mDish;
+        private final String mMessage;
 
-        ShareTask(String user, int dishID) {
+        ShareTask(String user, int dishID, String message) {
             mRecipient = user;
             mDish = dishID;
+            mMessage = new String(message);
         }
 
 
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
-            String request = "http://10.0.2.2:5000/share_dish?dish=" + mDish + "&from_user=" + HomeActivity.getUser() + "&to_user=" + mRecipient;
+            String request = "http://10.0.2.2:5000/share_dish?dish=" + mDish + "&from_user=" + HomeActivity.getUser() + "&to_user=" + mRecipient + "&message=" + mMessage.replace(" ", "+");
             return Utils.sendHTTPRequest(request, "POST");
         }
 
@@ -226,7 +228,7 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
                 public void onClick(DialogInterface dialog, int id) {
                     EditText username = (EditText) dialogView.findViewById(R.id.share_dialog_username);
                     EditText message = (EditText) dialogView.findViewById(R.id.share_dialog_message);
-                    activity.startShareTask(username.getText().toString());
+                    activity.startShareTask(username.getText().toString(), message.getText().toString());
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

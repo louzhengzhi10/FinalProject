@@ -69,7 +69,43 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
             });
         }
 
+        TextView sharedByText = (TextView) view.findViewById(R.id.shared_from);
+        TextView shareMessage = (TextView) view.findViewById(R.id.share_message);
+        if (dish.getMessage() != null && dish.getShared_by() != null) {
+            sharedByText.setText(dish.getShared_by());
+            shareMessage.setText(dish.getMessage());
+        }
 
+        setLikeView(view, dish);
+
+        ImageView deleteView = (ImageView) view.findViewById(R.id.delete_dish_icon);
+        if (deleatable) {
+            deleteView.setVisibility(View.VISIBLE);
+            deleteView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String response = null;
+                    if (deleteType != null) {
+                        String request = "http://10.0.2.2:5000/remove_" + deleteType + "?user=" + HomeActivity.getUser() + "&dish=" + dish.getId();
+                        try {
+                            response = new DeleteTask().execute(request, "POST").get();
+                        }
+                        catch (ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    dishes.remove(position);
+                    notifyDataSetChanged();
+                }
+            });
+        }
+        else
+            deleteView.setVisibility(View.INVISIBLE);
+
+        return view;
+    }
+
+    private void setLikeView(View view, final Dish dish) {
         ImageView likeView = (ImageView) view.findViewById(R.id.like_dish_icon);
         if (dish.isLiked())
             likeView.setImageResource(R.drawable.liked);
@@ -103,32 +139,6 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                 Toast.makeText(getContext(), response, Toast.LENGTH_SHORT).show();
             }
         });
-
-        ImageView deleteView = (ImageView) view.findViewById(R.id.delete_dish_icon);
-        if (deleatable) {
-            deleteView.setVisibility(View.VISIBLE);
-            deleteView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String response = null;
-                    if (deleteType != null) {
-                        String request = "http://10.0.2.2:5000/remove_history?user=" + HomeActivity.getUser() + "&dish=" + dish.getId();
-                        try {
-                            response = new DeleteTask().execute(request, "POST").get();
-                        }
-                        catch (ExecutionException | InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    dishes.remove(position);
-                    notifyDataSetChanged();
-                }
-            });
-        }
-        else
-            deleteView.setVisibility(View.INVISIBLE);
-
-        return view;
     }
 
     private String parseMessage(String message) {
