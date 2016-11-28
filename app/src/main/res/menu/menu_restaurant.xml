@@ -29,6 +29,14 @@
         />
 
     <item
+        android:id="@+id/action_comment"
+        android:title="Comment"
+        android:orderInCategory="100"
+        android:layout_alignParentRight="true"
+        app:showAsAction="never"
+        />
+
+    <item
         android:id="@+id/action_similar_restaurant"
         android:title="Similar Restaurants"
         android:orderInCategory="200"

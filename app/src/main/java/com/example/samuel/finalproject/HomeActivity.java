@@ -200,7 +200,7 @@ public class HomeActivity extends AppCompatActivity {
      * Inflate list view with restaurants
      */
     private void refreshRestaurantListView() {
-        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants);
+        RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, true);
         listView = (ListView) findViewById(R.id.home_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

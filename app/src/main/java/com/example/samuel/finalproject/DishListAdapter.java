@@ -29,14 +29,14 @@ import java.util.concurrent.ExecutionException;
 public class DishListAdapter extends ArrayAdapter<Dish> {
     private List<Dish> dishes;
     private Activity context;
-    private boolean deleatable;
+    private boolean deletable;
     private String deleteType;
 
     public DishListAdapter(Activity context, int resource, List<Dish> dishes, boolean deletable, String deleteType) {
         super(context, resource, dishes);
         this.dishes = dishes;
         this.context = context;
-        this.deleatable = deletable;
+        this.deletable = deletable;
         this.deleteType = deleteType;
     }
 
@@ -79,7 +79,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         setLikeView(view, dish);
 
         ImageView deleteView = (ImageView) view.findViewById(R.id.delete_dish_icon);
-        if (deleatable) {
+        if (deletable) {
             deleteView.setVisibility(View.VISIBLE);
             deleteView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -141,17 +141,6 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         });
     }
 
-    private String parseMessage(String message) {
-        try {
-            message = message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1).replace("\\", "");
-            return new String(new JSONObject(message).getString("message"));
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     /**
      * Asynchronous task used to send http request to backend server
      */
@@ -168,7 +157,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
 
             String message = Utils.sendHTTPRequest(request, "POST");
 
-            return parseMessage(message);
+            return Utils.parseMessage(message);
         }
     }
 
@@ -176,7 +165,7 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         @Override
         protected String doInBackground(String[] params) {
             String message = Utils.sendHTTPRequest(params[0], params[1]);
-            return parseMessage(message);
+            return Utils.parseMessage(message);
         }
     }
 

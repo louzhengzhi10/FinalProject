@@ -1,5 +1,6 @@
 package com.example.samuel.finalproject;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -114,4 +115,32 @@ public class Utils {
         }
         return restaurants;
     }
+
+    public static List<Comment> parseCommentList(String message) {
+        List<Comment> comments = new ArrayList<>();
+        try {
+            String[] splits = splitString(message);
+            for (String split : splits) {
+                split = split.replace("\\", "");
+                JSONObject comment = new JSONObject(split + "}");
+                comments.add(new Comment(comment.getString("user"), comment.getString("date"), comment.getString("comment")));
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return comments;
+    }
+
+    public static String parseMessage(String message) {
+        try {
+            message = message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1).replace("\\", "");
+            return new String(new JSONObject(message).getString("message"));
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

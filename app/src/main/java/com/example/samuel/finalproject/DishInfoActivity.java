@@ -86,7 +86,6 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
             public void onClick(View view) {
                 ShareDialogFragment dialog = new ShareDialogFragment();
                 Bundle args = new Bundle();
-                args.putInt("dish", dish.getId());
                 args.putSerializable("activity", DishInfoActivity.this);
                 dialog.setArguments(args);
                 dialog.show(getSupportFragmentManager(), "Share Dialog");
@@ -158,17 +157,8 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
 
         @Override
         protected void onPostExecute(String message) {
-            message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-            String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-            for (String split : splits) {
-                split = split.replace("\\", "");
-                try {
-                    JSONObject dish = new JSONObject(split + "}");
-                    Toast.makeText(DishInfoActivity.this, dish.getString("message"), Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    continue;
-                }
-            }
+            message = Utils.parseMessage(message);
+            Toast.makeText(DishInfoActivity.this, message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -190,22 +180,9 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request = "http://10.0.2.2:5000/share_dish?dish=" + mDish + "&from_user=" + HomeActivity.getUser() + "&to_user=" + mRecipient + "&message=" + mMessage.replace(" ", "+");
-            return Utils.sendHTTPRequest(request, "POST");
-        }
-
-        @Override
-        protected void onPostExecute(String message) {
-            message = message.substring(message.indexOf("{"), message.lastIndexOf("}"));
-            String[] splits = message.split(Pattern.quote("}, "), Integer.MAX_VALUE);
-            for (String split : splits) {
-                split = split.replace("\\", "");
-                try {
-                    JSONObject dish = new JSONObject(split + "}");
-                    Toast.makeText(DishInfoActivity.this, dish.getString("message"), Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    continue;
-                }
-            }
+            String message = Utils.sendHTTPRequest(request, "POST");
+            Toast.makeText(DishInfoActivity.this, Utils.parseMessage(message), Toast.LENGTH_SHORT).show();
+            return message;
         }
     }
 

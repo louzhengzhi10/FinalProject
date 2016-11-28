@@ -13,6 +13,7 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 import static android.os.Build.ID;
@@ -23,14 +24,16 @@ import static android.os.Build.ID;
 
 public class RestaurantListAdapter extends ArrayAdapter<Restaurant> {
     private List<Restaurant> restaurants;
+    private boolean deletable;
 
-    public RestaurantListAdapter(Activity context, int resource, List<Restaurant> restaurants) {
+    public RestaurantListAdapter(Activity context, int resource, List<Restaurant> restaurants, boolean deletable) {
         super(context, resource, restaurants);
         this.restaurants = restaurants;
+        this.deletable = deletable;
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup parent) {
+    public View getView(final int position, View view, ViewGroup parent) {
         if (view == null) {
             view = LayoutInflater.from(getContext()).inflate(R.layout.restaurant_list, parent, false);
         }
@@ -43,7 +46,20 @@ public class RestaurantListAdapter extends ArrayAdapter<Restaurant> {
         addressText.setText(restaurant.getAddress());
         TextView NumDishText = (TextView) view.findViewById(R.id.restaurant_liked_dishes);
 
-        // listener to on click event to like icon
+        ImageView deleteView = (ImageView) view.findViewById(R.id.delete_restaurant_icon);
+        if (deletable) {
+            deleteView.setVisibility(View.VISIBLE);
+            deleteView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    restaurants.remove(position);
+                    notifyDataSetChanged();
+                }
+            });
+        }
+        else
+            deleteView.setVisibility(View.INVISIBLE);
+
         return view;
     }
 }
