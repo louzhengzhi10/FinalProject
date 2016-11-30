@@ -181,7 +181,6 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request = "http://10.0.2.2:5000/share_dish?dish=" + mDish + "&from_user=" + HomeActivity.getUser() + "&to_user=" + mRecipient + "&message=" + mMessage.replace(" ", "+");
             String message = Utils.sendHTTPRequest(request, "POST");
-            Toast.makeText(DishInfoActivity.this, Utils.parseMessage(message), Toast.LENGTH_SHORT).show();
             return message;
         }
     }
