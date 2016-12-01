@@ -3,6 +3,9 @@ package com.example.samuel.finalproject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
@@ -11,6 +14,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -129,6 +133,22 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
         return true;
     }
 
+    private void addNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setSmallIcon(R.drawable.notification);
+        builder.setContentTitle("Notifications Example");
+        builder.setContentText("This is a test notification");
+
+        Intent notificationIntent = new Intent(getApplicationContext(), HomeActivity.class);
+        notificationIntent.putExtra("user", HomeActivity.getUser());
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
+    }
+
     public void startShareTask(String to_user, String message) {
         try {
             new ShareTask(to_user, dish.getId(), message).execute().get();
@@ -136,6 +156,8 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
         catch (Exception e) {
             e.printStackTrace();
         }
+
+        addNotification();
     }
 
     /**

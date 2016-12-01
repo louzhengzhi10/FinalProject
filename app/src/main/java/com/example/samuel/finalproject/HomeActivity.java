@@ -338,7 +338,5 @@ public class HomeActivity extends AppCompatActivity {
             refreshDishListView(true, deleteType);
         }
     }
-
-
 }
 
