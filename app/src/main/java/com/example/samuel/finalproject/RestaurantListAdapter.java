@@ -48,10 +48,12 @@ public class RestaurantListAdapter extends ArrayAdapter<Restaurant> {
 
         ImageView deleteView = (ImageView) view.findViewById(R.id.delete_restaurant_icon);
         if (deletable) {
+            // set visible if deletable
             deleteView.setVisibility(View.VISIBLE);
             deleteView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    // remove restaurant from list view
                     restaurants.remove(position);
                     notifyDataSetChanged();
                 }

@@ -56,6 +56,7 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
         }
 
         FloatingActionButton commentButton = (FloatingActionButton) findViewById(R.id.comment_button);
+        // create comment dialog on click
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,6 +114,10 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
         return true;
     }
 
+    /**
+     * Start add comment task, called from dialog fragment
+     * @param comment
+     */
     public void startAddCommentTask(String comment) {
         try {
             new AddCommentTask().execute(comment).get();
@@ -122,6 +127,9 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
         }
     }
 
+    /**
+     * Comment dialog fragment
+     */
     public static class CommentDialogFragment extends DialogFragment {
         private RestaurantActivity activity;
 
@@ -136,6 +144,7 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
 
             builder.setView(dialogView);
 
+            // submit comment
             builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
@@ -143,6 +152,7 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
                     activity.startAddCommentTask(message.getText().toString());
                 }
             });
+            // close dialog
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     RestaurantActivity.CommentDialogFragment.this.getDialog().cancel();
@@ -152,6 +162,9 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
         }
     }
 
+    /**
+     * Set restaurant list adapter
+     */
     private void refreshRestaurantListView() {
         RestaurantListAdapter adapter = new RestaurantListAdapter(this, R.layout.restaurant_list, restaurants, false);
         listView = (ListView)findViewById(R.id.restaurant_activity_list);
@@ -167,6 +180,9 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
         });
     }
 
+    /**
+     * Match similar restaurants
+     */
     private class SimilarRestaurantTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
@@ -236,12 +252,18 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
         }
     }
 
+    /**
+     * Set comment list adapter
+     */
     private void refreshCommentListView() {
         CommentListAdapter adapter = new CommentListAdapter(this, R.layout.comment_list, comments, id);
         listView = (ListView)findViewById(R.id.restaurant_activity_list);
         listView.setAdapter(adapter);
     }
 
+    /**
+     * Asynchronous to add comment
+     */
     private class AddCommentTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
@@ -250,6 +272,9 @@ public class RestaurantActivity extends AppCompatActivity implements Serializabl
         }
     }
 
+    /**
+     * Asynchronous task to retrieve comment
+     */
     private class SearchCommentTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {

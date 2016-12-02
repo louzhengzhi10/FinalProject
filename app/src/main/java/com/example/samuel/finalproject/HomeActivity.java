@@ -91,6 +91,7 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // check for new shared dishes, prepare notifications
         try {
             new ShareNotificationTask().execute().get();
         }
@@ -98,6 +99,7 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // activity started because user clicked notification, bring user to share list
         if (getIntent().getExtras().containsKey("notification"))
             onShareSelected();
         else
@@ -354,12 +356,17 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Push notification for one single dish
+     * @param dish
+     */
     private void addNotification(Dish dish) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setSmallIcon(R.drawable.notification);
         builder.setContentTitle("New Dish Share");
         builder.setContentText(dish.getName() + " from " + dish.getShared_by());
 
+        // bring user to home activity after clicking notification
         Intent notificationIntent = new Intent(getApplicationContext(), HomeActivity.class);
         notificationIntent.putExtra("user", HomeActivity.getUser());
         notificationIntent.putExtra("notification", true);
@@ -369,11 +376,15 @@ public class HomeActivity extends AppCompatActivity {
         // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // only notify once
         Notification notification = builder.build();
         notification.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
         manager.notify(0, notification);
     }
 
+    /**
+     * Push notifications for all new shared dishes
+     */
     private class ShareNotificationTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {

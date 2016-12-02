@@ -83,8 +83,8 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
             }
         });
 
-
         final Button mShareButton = (Button) findViewById(R.id.share_button);
+        // create share dialog on click
         mShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,6 +133,11 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
         return true;
     }
 
+    /**
+     * Called by share dialog fragment, necessary because static fragment cannot create asynchronous tasks
+     * @param to_user
+     * @param message
+     */
     public void startShareTask(String to_user, String message) {
         try {
             new ShareTask(to_user, dish.getId(), message).execute().get();
@@ -193,6 +198,9 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
         }
     }
 
+    /**
+     * Share dish dialog, required to be static by android
+     */
     public static class ShareDialogFragment extends DialogFragment {
         private DishInfoActivity activity;
 
@@ -207,6 +215,7 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
 
             builder.setView(dialogView);
 
+            // start share task
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
@@ -215,6 +224,7 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
                     activity.startShareTask(username.getText().toString(), message.getText().toString());
                 }
             });
+            // close dialog
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     DishInfoActivity.ShareDialogFragment.this.getDialog().cancel();

@@ -43,11 +43,13 @@ public class CommentListAdapter extends ArrayAdapter<Comment> {
 
         ImageView deleteView = (ImageView) view.findViewById(R.id.delete_comment_icon);
         deleteView.setVisibility(View.VISIBLE);
+        // event listener to remove comment
         deleteView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String response = null;
                 try {
+                    // wait for response
                     response = new DeleteCommentTask().execute(comment.getComment()).get();
                 }
                 catch (Exception e) {
@@ -64,6 +66,9 @@ public class CommentListAdapter extends ArrayAdapter<Comment> {
         return view;
     }
 
+    /**
+     * Asynchronous task to delete comments
+     */
     private class DeleteCommentTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {

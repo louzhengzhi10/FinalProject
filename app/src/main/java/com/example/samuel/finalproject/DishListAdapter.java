@@ -80,12 +80,14 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
 
         ImageView deleteView = (ImageView) view.findViewById(R.id.delete_dish_icon);
         if (deletable) {
+            // set visible if item deletable
             deleteView.setVisibility(View.VISIBLE);
             deleteView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String response = null;
                     if (deleteType != null) {
+                        // send remove history or share request
                         String request = "http://10.0.2.2:5000/remove_" + deleteType + "?user=" + HomeActivity.getUser() + "&dish=" + dish.getId();
                         try {
                             response = new DeleteTask().execute(request, "POST").get();
@@ -94,17 +96,24 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
                             e.printStackTrace();
                         }
                     }
+                    // from search bar, simply remove from list
                     dishes.remove(position);
                     notifyDataSetChanged();
                 }
             });
         }
+        // hide view if item not deletable
         else
             deleteView.setVisibility(View.INVISIBLE);
 
         return view;
     }
 
+    /**
+     * Set event listener to like image view
+     * @param view
+     * @param dish
+     */
     private void setLikeView(View view, final Dish dish) {
         ImageView likeView = (ImageView) view.findViewById(R.id.like_dish_icon);
         if (dish.isLiked())
@@ -161,6 +170,9 @@ public class DishListAdapter extends ArrayAdapter<Dish> {
         }
     }
 
+    /**
+     * Asynchronous task to delete dish
+     */
     private class DeleteTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String[] params) {
