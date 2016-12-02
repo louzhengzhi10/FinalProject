@@ -133,22 +133,6 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
         return true;
     }
 
-    private void addNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setSmallIcon(R.drawable.notification);
-        builder.setContentTitle("Notifications Example");
-        builder.setContentText("This is a test notification");
-
-        Intent notificationIntent = new Intent(getApplicationContext(), HomeActivity.class);
-        notificationIntent.putExtra("user", HomeActivity.getUser());
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
-
-        // Add as notification
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
-    }
-
     public void startShareTask(String to_user, String message) {
         try {
             new ShareTask(to_user, dish.getId(), message).execute().get();
@@ -156,8 +140,6 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
         catch (Exception e) {
             e.printStackTrace();
         }
-
-        addNotification();
     }
 
     /**
@@ -170,7 +152,7 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
             mDish = dishID;
         }
 
-
+        @Override
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request = "http://10.0.2.2:5000/set_history?user=" + HomeActivity.getUser() + "&dish=" + mDish;
@@ -198,12 +180,16 @@ public class DishInfoActivity extends AppCompatActivity implements Serializable 
             mMessage = new String(message);
         }
 
-
+        @Override
         protected String doInBackground(String[] params) {
             // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
             String request = "http://10.0.2.2:5000/share_dish?dish=" + mDish + "&from_user=" + HomeActivity.getUser() + "&to_user=" + mRecipient + "&message=" + mMessage.replace(" ", "+");
-            String message = Utils.sendHTTPRequest(request, "POST");
-            return message;
+            return Utils.sendHTTPRequest(request, "POST");
+        }
+
+        @Override
+        protected void onPostExecute(String message) {
+            Toast.makeText(DishInfoActivity.this, Utils.parseMessage(message), Toast.LENGTH_SHORT).show();
         }
     }
 

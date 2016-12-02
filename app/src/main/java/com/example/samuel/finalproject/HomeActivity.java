@@ -1,9 +1,14 @@
 package com.example.samuel.finalproject;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -86,7 +91,17 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        onSearchRestaurantSelected();
+        try {
+            new ShareNotificationTask().execute().get();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (getIntent().getExtras().containsKey("notification"))
+            onShareSelected();
+        else
+            onSearchRestaurantSelected();
     }
 
     public static String getUser() {
@@ -336,6 +351,40 @@ public class HomeActivity extends AppCompatActivity {
             dishes = Utils.parseDishList(message);
             String deleteType = "shared";
             refreshDishListView(true, deleteType);
+        }
+    }
+
+    private void addNotification(Dish dish) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setSmallIcon(R.drawable.notification);
+        builder.setContentTitle("New Dish Share");
+        builder.setContentText(dish.getName() + " from " + dish.getShared_by());
+
+        Intent notificationIntent = new Intent(getApplicationContext(), HomeActivity.class);
+        notificationIntent.putExtra("user", HomeActivity.getUser());
+        notificationIntent.putExtra("notification", true);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification notification = builder.build();
+        notification.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
+        manager.notify(0, notification);
+    }
+
+    private class ShareNotificationTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String[] params) {
+            // do not use 127.0.0.1, 127.0.0.1 refers to the emulator itself, use 10.0.2.2 instead
+            String request = "http://10.0.2.2:5000/get_shared?user=" + user;
+            dishes = Utils.parseDishList(Utils.sendHTTPRequest(request, "GET"));
+            for (Dish dish : dishes) {
+                if (!dish.isNotified())
+                    addNotification(dish);
+            }
+            return null;
         }
     }
 }

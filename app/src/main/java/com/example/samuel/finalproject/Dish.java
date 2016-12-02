@@ -15,6 +15,7 @@ public class Dish implements Serializable {
     private boolean liked;
     private String shared_by = null;
     private String message = null;
+    private boolean notified;
 
     public Dish(int id, String name, float price, boolean liked) {
         this.id = id;
@@ -30,10 +31,11 @@ public class Dish implements Serializable {
         this.restaurant_name = restaurant_name;
     }
 
-    public Dish(int id, String name, float price, int restaurant_id, String restaurant_name, boolean liked, String shared_by, String message) {
+    public Dish(int id, String name, float price, int restaurant_id, String restaurant_name, boolean liked, String shared_by, String message, boolean notified) {
         this(id, name, price, restaurant_id, restaurant_name, liked);
         this.shared_by = shared_by;
         this.message = message;
+        this.notified = notified;
     }
 
     public int getId() {
@@ -70,5 +72,9 @@ public class Dish implements Serializable {
 
     public String getMessage() {
         return message;
+    }
+
+    public boolean isNotified() {
+        return notified;
     }
 }

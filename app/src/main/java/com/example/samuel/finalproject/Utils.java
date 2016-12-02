@@ -79,7 +79,7 @@ public class Utils {
                 if (dish.has("friend") && dish.has("message"))
                     dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
                             dish.getInt("restaurant_id"), dish.getString("restaurant_name"), liked,
-                            dish.getString("friend"), dish.getString("message")));
+                            dish.getString("friend"), dish.getString("message"), dish.getInt("notified") != 0));
                 else if (dish.has("restaurant_id") && dish.has("restaurant_name"))
                     dishes.add(new Dish(dish.getInt("id"), dish.getString("name"), (float) dish.getDouble("price"),
                             dish.getInt("restaurant_id"), dish.getString("restaurant_name"), liked));
